@@ -49,3 +49,26 @@ $ curl -X PUT -d '42' http://localhost:8001/store
 }
 ```
 
+### Fetch the current namespace mapping
+
+```shell
+$ curl -X PUT -d '42' http://localhost:8001/namespaces
+{
+    "namespaces": {
+        "bldg": "https://brickschema.org/schema/1.1.0/ExampleBuilding#",
+        "brick": "https://brickschema.org/schema/1.1.0/Brick#",
+        "dcterms": "http://purl.org/dc/terms#",
+        "n": "http://ses.sdk.dk/junk/test#",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "sdo": "http://schema.org#",
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "tag": "https://brickschema.org/schema/1.1.0/BrickTag#",
+        "xml": "http://www.w3.org/XML/1998/namespace",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
+    },
+    "success": true
+}
+```
+

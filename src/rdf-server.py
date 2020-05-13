@@ -98,6 +98,18 @@ async def handler_store (path: str, payload):
         }, sort_keys=True, indent=4, separators=(',', ': '))
         return web.Response(status=500, text=message)
 
+async def handler_namespaces (path: str, payload):
+    # collect info
+    namespaces = {}
+    for prefix, namespace in m.namespaces():
+        namespaces[prefix] = namespace
+    
+    message = json.dumps({
+        'success': True,
+        'namespaces': namespaces,
+    }, sort_keys=True, indent=4, separators=(',', ': '))
+    return web.Response(status=200, text=message)
+    
 async def handler (request: web.Request):
     method  =       request.method
     path    =   str(request.rel_url)[1:]
@@ -152,8 +164,9 @@ if not path.exists(model_dir):
 load_model(model_dir, namespace)
 
 # register handlers
-register_handler('time' , handler_time)
-register_handler('store', handler_store)
+register_handler('time'      , handler_time)
+register_handler('store'     , handler_store)
+register_handler('namespaces', handler_namespaces)
 
 loop = asyncio.get_event_loop()
 asyncio.Task(main(interface, port))
