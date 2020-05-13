@@ -736,3 +736,12 @@ $ curl -X PUT -d '"SELECT ?pred ?obj WHERE {brick:Sensor ?pred ?obj .}"' http://
 
 ```
 
+### Performing an update
+
+```shell
+$ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n\nDELETE { brick:Sensor rdfs:subClassOf ?obj .} WHERE {brick:Sensor rdfs:subClassOf ?obj .}"' http://localhost:8001/update
+{
+    "success": true
+}
+```
+

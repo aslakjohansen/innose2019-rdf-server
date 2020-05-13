@@ -127,6 +127,20 @@ async def handler_query (path: str, payload):
         }, sort_keys=True, indent=4, separators=(',', ': '))
         return web.Response(status=500, text=message)
 
+async def handler_update (path: str, payload):
+    try:
+        m.update(payload)
+        message = json.dumps({
+            'success': True,
+        }, sort_keys=True, indent=4, separators=(',', ': '))
+        return web.Response(status=200, text=message)
+    except Exception as e:
+        message = json.dumps({
+            'success': False,
+            'error': str(e),
+        }, sort_keys=True, indent=4, separators=(',', ': '))
+        return web.Response(status=500, text=message)
+
 async def handler (request: web.Request):
     method  =       request.method
     path    =   str(request.rel_url)[1:]
@@ -185,6 +199,7 @@ register_handler('time'      , handler_time)
 register_handler('store'     , handler_store)
 register_handler('namespaces', handler_namespaces)
 register_handler('query'     , handler_query)
+register_handler('update'    , handler_update)
 
 loop = asyncio.get_event_loop()
 asyncio.Task(main(interface, port))
