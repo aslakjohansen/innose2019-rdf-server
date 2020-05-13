@@ -109,7 +109,24 @@ async def handler_namespaces (path: str, payload):
         'namespaces': namespaces,
     }, sort_keys=True, indent=4, separators=(',', ': '))
     return web.Response(status=200, text=message)
-    
+
+async def handler_query (path: str, payload):
+    try:
+        resultset = []
+        for row in m.query(payload):
+            resultset.append(list(map(lambda element: '%s' % element, row)))
+        message = json.dumps({
+            'success': True,
+            'resultset': resultset,
+        }, sort_keys=True, indent=4, separators=(',', ': '))
+        return web.Response(status=200, text=message)
+    except Exception as e:
+        message = json.dumps({
+            'success': False,
+            'error': str(e),
+        }, sort_keys=True, indent=4, separators=(',', ': '))
+        return web.Response(status=500, text=message)
+
 async def handler (request: web.Request):
     method  =       request.method
     path    =   str(request.rel_url)[1:]
@@ -167,6 +184,7 @@ load_model(model_dir, namespace)
 register_handler('time'      , handler_time)
 register_handler('store'     , handler_store)
 register_handler('namespaces', handler_namespaces)
+register_handler('query'     , handler_query)
 
 loop = asyncio.get_event_loop()
 asyncio.Task(main(interface, port))
