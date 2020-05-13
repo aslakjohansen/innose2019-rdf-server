@@ -162,7 +162,8 @@ asyncio.Task(main(interface, port))
 try:
     loop.run_forever()
 except KeyboardInterrupt:
-    print("STATUS: Exiting ...")
+    print('')
+    print('STATUS: Exiting ...')
     loop.close()
     exit(0)
 

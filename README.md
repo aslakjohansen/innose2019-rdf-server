@@ -17,7 +17,8 @@ Syntax: ./rdf-server.py INTERFACE PORT MODEL_DIR NAMESPACE
 innose2019-rdf-server/src$ ./rdf-server.py 0.0.0.0 8001 ../var/model http://ses.sdk.dk/junk/test#
 STATUS: Loading model "../var/model/3.ttl".
 STATUS: Listening on 0.0.0.0:8001
-^CSTATUS: Exiting ...
+^C
+STATUS: Exiting ...
 innose2019-rdf-server/src$ 
 
 ```
