@@ -19,8 +19,6 @@ STATUS: Loading model "../var/model/3.ttl".
 STATUS: Listening on 0.0.0.0:8001
 ^C
 STATUS: Exiting ...
-innose2019-rdf-server/src$ 
-
 ```
 
 **Note:** The current version of Brick is quite large and thus takes a considerable amount of time to load/store.
