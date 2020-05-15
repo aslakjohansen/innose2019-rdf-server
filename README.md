@@ -12,9 +12,9 @@
 
 ```shell
 innose2019-rdf-server/src$ ./rdf-server.py 
-Syntax: ./rdf-server.py INTERFACE PORT MODEL_DIR NAMESPACE
+Syntax: ./rdf-server.py INTERFACE PORT MODEL_DIR ONTOLOGY_DIR
         ./rdf-server.py 0.0.0.0 8001 ../var/model http://ses.sdk.dk/junk/test#
-innose2019-rdf-server/src$ ./rdf-server.py 0.0.0.0 8001 ../var/model http://ses.sdk.dk/junk/test#
+innose2019-rdf-server/src$ ./rdf-server.py 0.0.0.0 8001 ../var/model ../var/ontologies
 STATUS: Loading model "../var/model/3.ttl".
 STATUS: Listening on 0.0.0.0:8001
 ^C
