@@ -59,7 +59,6 @@ def load_model (model_dir: str, ontology_dir: str):
         m.bind('rdfs' , RDFS)
         m.bind('owl'  , OWL)
         m.bind('xsd'  , XSD)
-#        m.bind('brick', BRICK)
         
         # load extra namespaces
         namespace_map_filename = '%s/namespaces.json' % ontology_dir
