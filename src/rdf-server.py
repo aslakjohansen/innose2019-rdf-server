@@ -49,12 +49,15 @@ def load_model (model_dir: str, ontology_dir: str):
         m.parse(latest_model, format='turtle')
     else:
         print('STATUS: No model found in "%s", starting with a blank model.' % model_dir)
+        
+        # fixed namespaces
         RDF   = Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
         RDFS  = Namespace('http://www.w3.org/2000/01/rdf-schema#')
         OWL   = Namespace('http://www.w3.org/2002/07/owl#')
         XSD   = Namespace('http://www.w3.org/2001/XMLSchema#')
         BRICK = Namespace('https://brickschema.org/schema/1.1.0/Brick#')
         
+        # fixed namespace mapping
         m.bind('rdf'  , RDF)
         m.bind('rdfs' , RDFS)
         m.bind('owl'  , OWL)
