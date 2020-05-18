@@ -168,21 +168,28 @@ async def handler (request: web.Request):
     path    =   str(request.rel_url)[1:]
     payload = await request.content.read()
     
-    payload = json.loads(payload.decode('utf-8'))
-    
-    # produce answer
-    if path in dispatch:
-        return await dispatch[path](path, payload)
-    else:
+    try:
+        payload = json.loads(payload.decode('utf-8'))
+        
+        # produce answer
+        if path in dispatch:
+            return await dispatch[path](path, payload)
+        else:
+            message = json.dumps({
+                'success': False,
+                'error': {
+                    'description': 'No handler registered for path',
+                    'method':      method,
+                    'path':        path,
+                },
+            }, sort_keys=True, indent=4, separators=(',', ': '))
+            return web.Response(status=404, text=message)
+    except Exception as e:
         message = json.dumps({
             'success': False,
-            'error': {
-                'description': 'No handler registered for path',
-                'method':      method,
-                'path':        path,
-            },
+            'exception': str(e),
         }, sort_keys=True, indent=4, separators=(',', ': '))
-        return web.Response(status=404, text=message)
+        return web.Response(status=500, text=message)
 
 ###############################################################################
 ########################################################################## main
