@@ -743,3 +743,8 @@ $ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n
 }
 ```
 
+**Note:** rdflib has a few restrictions:
+- namespace prefixes must be used
+- a where clause must exist
+- no slashes in entity names
+
