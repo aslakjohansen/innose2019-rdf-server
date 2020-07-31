@@ -8,9 +8,9 @@ import (
 
 var (
     module_name string = "logic"
+    python_load_model *python.PyObject
     python_time       *python.PyObject
     python_store      *python.PyObject
-    python_load_model *python.PyObject
     python_namespaces *python.PyObject
     python_query      *python.PyObject
     python_update     *python.PyObject
@@ -32,6 +32,11 @@ func Init (model_dir string, ontology_dir string) {
         fmt.Println("Unable to import module '"+module_name+"'")
     }
     
+    python_load_model = module.GetAttrString("load_model")
+    if python_load_model == nil {
+        fmt.Println("Unable to name function 'load_model' in module '"+module_name+"'")
+    }
+    
     python_time = module.GetAttrString("time")
     if python_time == nil {
         fmt.Println("Unable to name function 'time' in module '"+module_name+"'")
@@ -40,11 +45,6 @@ func Init (model_dir string, ontology_dir string) {
     python_store = module.GetAttrString("store")
     if python_store == nil {
         fmt.Println("Unable to name function 'store' in module '"+module_name+"'")
-    }
-    
-    python_load_model = module.GetAttrString("load_model")
-    if python_load_model == nil {
-        fmt.Println("Unable to name function 'load_model' in module '"+module_name+"'")
     }
     
     python_namespaces = module.GetAttrString("namespaces")
