@@ -10,7 +10,10 @@ func time_handler (rw http.ResponseWriter, request *http.Request) {
     var result float64
     var success bool
     result, success = Time()
-    rw.Write([]byte(fmt.Sprintf("{\n    'success': %t,\n    'time': %f\n}\n", success, result)))
+    rw.Write([]byte("{\n"))
+    rw.Write([]byte(fmt.Sprintf("    'success': %t,\n", success)))
+    rw.Write([]byte(fmt.Sprintf("    'time': %f\n", result)))
+    rw.Write([]byte("}\n"))
 }
 
 func store_handler (rw http.ResponseWriter, request *http.Request) {
