@@ -6,7 +6,7 @@ import json
 ###############################################################################
 ################################################################ input / output
 
-def get_latest_model_id (model_dir: str):
+def get_latest_model_id (model_dir):
     # locate potentials
     potentials = []
     for filename in listdir(model_dir):
@@ -21,7 +21,7 @@ def get_latest_model_id (model_dir: str):
     
     return latest_id
 
-def load_model (model_dir: str, ontology_dir: str):
+def load_model (model_dir, ontology_dir):
     global m
     
     latest_id = get_latest_model_id(model_dir)
@@ -71,7 +71,7 @@ def load_model (model_dir: str, ontology_dir: str):
             print('NOTICE: No directory for loading ontologies')
         
 
-def store_model (model_dir: str):
+def store_model (model_dir):
     latest_id = get_latest_model_id(model_dir)
     if not latest_id: latest_id = 0
     model_filename = '%s/%u.ttl' % (model_dir, latest_id+1)
@@ -84,11 +84,13 @@ def store_model (model_dir: str):
 
 def time ():
     try:
-        return True, time_time()
+        print(time_time())
+        print(type(time_time()))
+        return True, float(time_time())
     except Exception as e:
         return False, str(e)
 
-def store (model_dir: str):
+def store (model_dir):
     try:
         model_filename = store_model(model_dir)
         return True, model_filename
@@ -104,7 +106,7 @@ def namespaces ():
     except Exception as e:
         return False, str(e)
 
-def query (q: str):
+def query (q):
     try:
         resultset = []
         for row in m.query(q):
@@ -113,7 +115,7 @@ def query (q: str):
     except Exception as e:
         return False, str(e)
 
-def update (q: str):
+def update (q):
     try:
         m.update(q)
         return True, None

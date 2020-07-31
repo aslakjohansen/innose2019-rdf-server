@@ -7,6 +7,7 @@
   - `asyncio`
   - `aiohttp`
   - `json`
+- The `python2.7-dev` package (as it is a dependency for go-python)
 
 ## Running
 

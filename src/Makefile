@@ -17,6 +17,6 @@ deps:
 	go get github.com/sbinet/go-python
 
 
-rdf-server: rdf-server.go
-	go build -x rdf-server.go
+rdf-server: rdf-server.go logic.go
+	go build -x rdf-server.go logic.go
 

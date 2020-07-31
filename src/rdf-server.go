@@ -7,8 +7,10 @@ import (
 )
 
 func time_handler (rw http.ResponseWriter, request *http.Request) {
-    var result float64 = 42.56
-    rw.Write([]byte(fmt.Sprintf("%f",result)))
+    var result float64
+    var success bool
+    result, success = Time()
+    rw.Write([]byte(fmt.Sprintf("{\n    'success': %t,\n    'time': %f\n}\n", success, result)))
 }
 
 func store_handler (rw http.ResponseWriter, request *http.Request) {
@@ -44,6 +46,8 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
 func main () {
     var port int16 = 8001
     
+    Init()
+    
     go func () {
         http.HandleFunc("/time"      , time_handler)
         http.HandleFunc("/store"     , store_handler)
@@ -62,4 +66,5 @@ func main () {
     }()
     
     select{} // block forever
+    Finalize()
 }
