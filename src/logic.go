@@ -8,13 +8,15 @@ import (
 
 var (
     module_name string = "logic"
-    time *python.PyObject
+    python_time       *python.PyObject
+    python_store      *python.PyObject
+    python_load_model *python.PyObject
 )
 
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// lifecycle management
 
-func Init () {
+func Init (model_dir string, ontology_dir string) {
     runtime.LockOSThread() // stick go routine to thread
     
     err := python.Initialize()
@@ -27,10 +29,22 @@ func Init () {
         fmt.Println("Unable to import module '"+module_name+"'")
     }
     
-    time = module.GetAttrString("time")
-    if time == nil {
+    python_time = module.GetAttrString("time")
+    if python_time == nil {
         fmt.Println("Unable to name function 'time' in module '"+module_name+"'")
     }
+    
+    python_store = module.GetAttrString("store")
+    if python_store == nil {
+        fmt.Println("Unable to name function 'store' in module '"+module_name+"'")
+    }
+    
+    python_load_model = module.GetAttrString("load_model")
+    if python_load_model == nil {
+        fmt.Println("Unable to name function 'load_model' in module '"+module_name+"'")
+    }
+    
+    load_model(model_dir, ontology_dir)
 }
 
 func Finalize () {
@@ -40,14 +54,42 @@ func Finalize () {
     }
 }
 
+func load_model (model_dir string, ontology_dir string) {
+    state, gstate := enter()
+    
+    // construct arguments
+    args := python.PyTuple_New(2)
+    python.PyTuple_SET_ITEM(args, 0, python.PyString_FromString(model_dir))
+    python.PyTuple_SET_ITEM(args, 1, python.PyString_FromString(ontology_dir))
+    
+    python_load_model.Call(args, python.PyDict_New())
+    
+    leave(state, gstate)
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////// handlers
 
 func Time () (float64, bool) {
     state, gstate := enter()
     
-    resPython := time.Call(python.PyTuple_New(0), python.PyDict_New())
+    resPython := python_time.Call(python.PyTuple_New(0), python.PyDict_New())
     success, result := unpack_float64(resPython)
+    
+    leave(state, gstate)
+    return result, success;
+}
+
+func Store (model_dir string) (string, bool) {
+    state, gstate := enter()
+    
+    // construct arguments
+    args := python.PyTuple_New(1)
+    python.PyTuple_SET_ITEM(args, 0, python.PyString_FromString(model_dir))
+    
+    resPython := python_store.Call(args, python.PyDict_New())
+    success, result := unpack_string(resPython)
     
     leave(state, gstate)
     return result, success;
@@ -81,11 +123,12 @@ func unpack (tuple *python.PyObject) (bool, *python.PyObject) {
     var success *python.PyObject = python.PyTuple_GET_ITEM(tuple, 0)
     var result  *python.PyObject = python.PyTuple_GET_ITEM(tuple, 1)
     
-    // guard: 
+    // guard: type of success
     if !python.PyBool_Check(success) {
         return false, nil
     }
     
+    // parse success
     success_long := python.PyInt_AsLong(success)
     if python.PyErr_Occurred()!=nil {
         fmt.Println("Decoding of python return value failed")
@@ -111,10 +154,37 @@ func unpack_float64 (tuple *python.PyObject) (bool, float64) {
         return false, 2.0
     }
     
+    // convert
     res := python.PyFloat_AsDouble(result)
     if python.PyErr_Occurred()!=nil {
         fmt.Println("Decoding of python return value failed")
         return false, 3.0
+    }
+    
+    return true, res
+}
+
+func unpack_string (tuple *python.PyObject) (bool, string) {
+    var success  bool
+    var result  *python.PyObject
+    
+    success, result = unpack(tuple)
+    
+    // guard: not success
+    if !success {
+        return false , "no success"
+    }
+    
+    // guard: result is a float
+    if !python.PyString_Check(result) {
+        return false, "result not a float"
+    }
+    
+    // convert
+    res := python.PyString_AsString(result)
+    if python.PyErr_Occurred()!=nil {
+        fmt.Println("Decoding of python return value failed")
+        return false, "does not decode as string"
     }
     
     return true, res

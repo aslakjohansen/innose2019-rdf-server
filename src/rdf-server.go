@@ -6,6 +6,11 @@ import (
     "net/http"
 )
 
+var (
+    model_dir    string = "../var/model"
+    ontology_dir string = "../var/ontologies"
+)
+
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////// handlers
 
@@ -20,8 +25,13 @@ func time_handler (rw http.ResponseWriter, request *http.Request) {
 }
 
 func store_handler (rw http.ResponseWriter, request *http.Request) {
-    var result float64 = 42.56
-    rw.Write([]byte(fmt.Sprintf("%f",result)))
+    var success bool
+    var result string
+    result, success = Store(model_dir)
+    rw.Write([]byte("{\n"))
+    rw.Write([]byte(fmt.Sprintf("    'success': %t,\n", success)))
+    rw.Write([]byte(fmt.Sprintf("    'filename': %s\n", result)))
+    rw.Write([]byte("}\n"))
 }
 
 func namespace_handler (rw http.ResponseWriter, request *http.Request) {
@@ -55,7 +65,7 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
 func main () {
     var port int16 = 8001
     
-    Init()
+    Init(model_dir, ontology_dir)
     
     go func () {
         http.HandleFunc("/time"      , time_handler)
