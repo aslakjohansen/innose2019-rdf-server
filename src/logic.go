@@ -41,13 +41,7 @@ func Time () (float64, bool) {
     state, gstate := enter()
     
     resPython := time.Call(python.PyTuple_New(0), python.PyDict_New())
-    
-    // decode result
     success, result := unpack_float64(resPython)
-//    res := python.PyFloat_AsDouble(resPython)
-//    if python.PyErr_Occurred()!=nil {
-//        fmt.Println("Decoding of python return value failed")
-//    }
     
     leave(state, gstate)
     return result, success;
