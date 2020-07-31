@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "io/ioutil"
     "net/http"
 )
 
@@ -21,13 +22,23 @@ func namespace_handler (rw http.ResponseWriter, request *http.Request) {
 }
 
 func query_handler (rw http.ResponseWriter, request *http.Request) {
-    var result float64 = 42.56
-    rw.Write([]byte(fmt.Sprintf("%f",result)))
+    input, err := ioutil.ReadAll(request.Body)
+    if err != nil {
+        fmt.Println(err)
+    }
+    var inputString string = string(input)
+    fmt.Println("received '"+inputString+"'")
+    rw.Write([]byte(inputString))
 }
 
 func update_handler (rw http.ResponseWriter, request *http.Request) {
-    var result float64 = 42.56
-    rw.Write([]byte(fmt.Sprintf("%f",result)))
+    input, err := ioutil.ReadAll(request.Body)
+    if err != nil {
+        fmt.Println(err)
+    }
+    var inputString string = string(input)
+    
+    rw.Write([]byte(inputString))
 }
 
 func main () {
