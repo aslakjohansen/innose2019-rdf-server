@@ -84,8 +84,6 @@ def store_model (model_dir):
 
 def time ():
     try:
-        print(time_time())
-        print(type(time_time()))
         return True, float(time_time())
     except Exception as e:
         return False, str(e)
