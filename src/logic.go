@@ -11,6 +11,9 @@ var (
     python_time       *python.PyObject
     python_store      *python.PyObject
     python_load_model *python.PyObject
+    python_namespaces *python.PyObject
+    python_query      *python.PyObject
+    python_update     *python.PyObject
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,6 +45,21 @@ func Init (model_dir string, ontology_dir string) {
     python_load_model = module.GetAttrString("load_model")
     if python_load_model == nil {
         fmt.Println("Unable to name function 'load_model' in module '"+module_name+"'")
+    }
+    
+    python_namespaces = module.GetAttrString("namespaces")
+    if python_namespaces == nil {
+        fmt.Println("Unable to name function 'namespaces' in module '"+module_name+"'")
+    }
+    
+    python_query = module.GetAttrString("query")
+    if python_query == nil {
+        fmt.Println("Unable to name function 'query' in module '"+module_name+"'")
+    }
+    
+    python_update = module.GetAttrString("update")
+    if python_update == nil {
+        fmt.Println("Unable to name function 'update' in module '"+module_name+"'")
     }
     
     load_model(model_dir, ontology_dir)
