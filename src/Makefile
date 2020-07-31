@@ -6,7 +6,12 @@ all: ${TARGETS}
 	PYTHONPATH=. ./rdf-server
 
 clean:
-	rm ${TARGETS}
+	touch ${TARGETS}
+	rm    ${TARGETS}
+
+mrproper:
+	touch d~ __pycache__
+	rm -R *~ __pycache__
 
 deps:
 	go get github.com/sbinet/go-python
