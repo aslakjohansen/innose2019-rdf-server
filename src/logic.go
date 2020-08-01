@@ -122,6 +122,21 @@ func Namespaces () (map[string]string, bool) {
     return result, success;
 }
 
+func Query (q string) ([][]string, bool) {
+    fmt.Println("logic.go:Query", q)
+    state, gstate := enter()
+    
+    // construct arguments
+    args := python.PyTuple_New(1)
+    python.PyTuple_SET_ITEM(args, 0, python.PyString_FromString(q))
+    
+    resPython := python_query.Call(args, python.PyDict_New())
+    success, result := unpack_string2d(resPython)
+    
+    leave(state, gstate)
+    return result, success;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////// helpers
 
@@ -297,9 +312,92 @@ func unpack_string2string (tuple *python.PyObject) (bool, map[string]string) {
             return false, nil
         }
         
-        fmt.Println("key", key, "value", value)
-        
         res[key_str] = value_str
+    }
+    
+    return true, res
+}
+
+func unpack_string2d (tuple *python.PyObject) (bool, [][]string) {
+    var success  bool
+    var result  *python.PyObject
+    
+    success, result = unpack(tuple)
+    
+    // guard: not success
+    if !success {
+        fmt.Println("Unpacking of python return value was not a success")
+        return false , nil
+    }
+    
+    // guard: result is a dict
+    if !python.PyList_Check(result) {
+        fmt.Println("Python return value is not a list")
+        return false, nil
+    }
+    
+    row_count := python.PyList_GET_SIZE(result)
+    fmt.Println("Number of rows", row_count)
+    
+    var col_count int
+    var res       [][]string = make([][]string, row_count)
+    for r := 0 ; r<row_count ; r++ {
+        var row *python.PyObject = python.PyList_GET_ITEM(result, r)
+        
+        // guard: is a list
+        if !python.PyList_Check(row) {
+            fmt.Println("Row", r, "in result not a list")
+            return false, nil
+        }
+        
+        // allocate and construct the 2d array
+        if r==0 {
+            col_count = python.PyList_GET_SIZE(row)
+        }
+        res[r] = make([]string, col_count)
+        
+        for c:=0 ; c<col_count ; c++ {
+            var cell *python.PyObject = python.PyList_GET_ITEM(row, c)
+            fmt.Println(r, c)
+            // guard: cell is nil
+            if cell==nil {
+                fmt.Println("Cell is nil")
+                return false, nil
+            }
+            
+            if python.PyByteArray_Check(cell) {
+                fmt.Println("cell is bytearray")
+            }
+//            if python.PyCapsule_Check(cell) {
+//                fmt.Println("cell is capsule")
+//            }
+            if python.PyFunction_Check(cell) {
+                fmt.Println("cell is function")
+            }
+            if python.PySlice_Check(cell) {
+                fmt.Println("cell is slice")
+            }
+            if python.PyTuple_Check(cell) {
+                fmt.Println("cell is tuple")
+            }
+            fmt.Println("Cell string representation:", cell.String())
+            
+//            // guard: cell is a string
+//            if !python.PyString_Check(cell) {
+//                fmt.Println("Cell is not a string")
+//                return false, nil
+//            }
+            
+//            t = cell.Type()
+//            var t_str string
+            
+            
+            res[r][c] = python.PyString_AsString(cell)
+            if python.PyErr_Occurred()!=nil {
+                fmt.Println("Decoding of cell failed")
+                return false, nil
+            }
+        }
     }
     
     return true, res
