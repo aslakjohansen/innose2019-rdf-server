@@ -76,8 +76,6 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
         return
     }
     
-    fmt.Println("rdf-server.go:query_handler", query_str[1:query_len-1])
-    
     var success bool
     var result [][]string
     result, success = Query(query_str[1:query_len-1])

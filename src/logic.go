@@ -123,7 +123,6 @@ func Namespaces () (map[string]string, bool) {
 }
 
 func Query (q string) ([][]string, bool) {
-    fmt.Println("logic.go:Query", q)
     state, gstate := enter()
     
     // construct arguments
@@ -358,39 +357,18 @@ func unpack_string2d (tuple *python.PyObject) (bool, [][]string) {
         
         for c:=0 ; c<col_count ; c++ {
             var cell *python.PyObject = python.PyList_GET_ITEM(row, c)
-            fmt.Println(r, c)
+            
             // guard: cell is nil
             if cell==nil {
                 fmt.Println("Cell is nil")
                 return false, nil
             }
             
-            if python.PyByteArray_Check(cell) {
-                fmt.Println("cell is bytearray")
-            }
-//            if python.PyCapsule_Check(cell) {
-//                fmt.Println("cell is capsule")
-//            }
-            if python.PyFunction_Check(cell) {
-                fmt.Println("cell is function")
-            }
-            if python.PySlice_Check(cell) {
-                fmt.Println("cell is slice")
-            }
-            if python.PyTuple_Check(cell) {
-                fmt.Println("cell is tuple")
-            }
-            fmt.Println("Cell string representation:", cell.String())
-            
 //            // guard: cell is a string
 //            if !python.PyString_Check(cell) {
 //                fmt.Println("Cell is not a string")
 //                return false, nil
 //            }
-            
-//            t = cell.Type()
-//            var t_str string
-            
             
             res[r][c] = python.PyString_AsString(cell)
             if python.PyErr_Occurred()!=nil {

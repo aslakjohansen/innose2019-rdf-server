@@ -106,14 +106,11 @@ def namespaces ():
 
 def query (q):
     try:
-        print(q)
         resultset = []
         for row in m.query(q):
             resultset.append(list(map(lambda element: '%s' % element, row)))
-        print(True, resultset)
         return True, resultset
     except Exception as e:
-        print(False, str(e))
         return False, str(e)
 
 def update (q):
