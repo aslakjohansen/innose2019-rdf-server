@@ -85,7 +85,6 @@ func load_model (model_dir string, ontology_dir string) {
     leave(state, gstate)
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////// handlers
 
@@ -108,6 +107,16 @@ func Store (model_dir string) (string, bool) {
     
     resPython := python_store.Call(args, python.PyDict_New())
     success, result := unpack_string(resPython)
+    
+    leave(state, gstate)
+    return result, success;
+}
+
+func Namespaces () (map[string]string, bool) {
+    state, gstate := enter()
+    
+    resPython := python_namespaces.Call(python.PyTuple_New(0), python.PyDict_New())
+    success, result := unpack_string2string(resPython)
     
     leave(state, gstate)
     return result, success;
@@ -193,9 +202,9 @@ func unpack_string (tuple *python.PyObject) (bool, string) {
         return false , "no success"
     }
     
-    // guard: result is a float
+    // guard: result is a string
     if !python.PyString_Check(result) {
-        return false, "result not a float"
+        return false, "result not a string"
     }
     
     // convert
@@ -203,6 +212,94 @@ func unpack_string (tuple *python.PyObject) (bool, string) {
     if python.PyErr_Occurred()!=nil {
         fmt.Println("Decoding of python return value failed")
         return false, "does not decode as string"
+    }
+    
+    return true, res
+}
+
+func unpack_string2string (tuple *python.PyObject) (bool, map[string]string) {
+    var success  bool
+    var result  *python.PyObject
+    
+    success, result = unpack(tuple)
+    
+    // guard: not success
+    if !success {
+        fmt.Println("Unpacking of python return value was not a success")
+        return false , nil
+    }
+    
+    // guard: result is a dict
+    if !python.PyDict_Check(result) {
+        fmt.Println("Python return value is not a dict")
+        return false, nil
+    }
+    
+    // convert to items
+    items := python.PyDict_Items(result)
+    if python.PyErr_Occurred()!=nil {
+        fmt.Println("Extraction of items from python return value failed")
+        return false, nil
+    }
+    
+    // guard: items is a list
+    if !python.PyList_Check(items) {
+        fmt.Println("Items from dict is not a list")
+        return false, nil
+    }
+    
+    size := python.PyList_GET_SIZE(items)
+    fmt.Println("Number of namespaces", size)
+    
+    // construct map
+    var res map[string]string = make(map[string]string)
+    for i := 0 ; i < size ; i++ {
+        var tuple *python.PyObject = python.PyList_GET_ITEM(items, i)
+        
+        // guard: is a tuple
+        if !python.PyTuple_Check(tuple) {
+            fmt.Println("Element",i, "in list not a tuple")
+            return false, nil
+        }
+        
+        // guard: has two elements
+        if python.PyTuple_GET_SIZE(tuple)!=2 {
+            fmt.Println("Tuple does not have exactly 2 elements")
+            return false, nil
+        }
+        
+        var key   *python.PyObject = python.PyTuple_GET_ITEM(tuple, 0)
+        var value *python.PyObject = python.PyTuple_GET_ITEM(tuple, 1)
+        
+        // guard: key is a string
+        if !python.PyString_Check(key) {
+            fmt.Println("Key is not a string")
+            return false, nil
+        }
+        
+        // guard: value is a string
+        if !python.PyString_Check(value) {
+            fmt.Println("Value is not a string")
+            return false, nil
+        }
+        
+        // extract string representation of key
+        var key_str string = python.PyString_AsString(key)
+        if python.PyErr_Occurred()!=nil {
+            fmt.Println("Decoding of python key failed")
+            return false, nil
+        }
+        
+        // extract string representation of value
+        var value_str string = python.PyString_AsString(value)
+        if python.PyErr_Occurred()!=nil {
+            fmt.Println("Decoding of python value failed")
+            return false, nil
+        }
+        
+        fmt.Println("key", key, "value", value)
+        
+        res[key_str] = value_str
     }
     
     return true, res

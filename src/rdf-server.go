@@ -35,8 +35,24 @@ func store_handler (rw http.ResponseWriter, request *http.Request) {
 }
 
 func namespace_handler (rw http.ResponseWriter, request *http.Request) {
-    var result float64 = 42.56
-    rw.Write([]byte(fmt.Sprintf("%f",result)))
+    var success bool
+    var result map[string]string
+    result, success = Namespaces()
+    rw.Write([]byte("{\n"))
+    rw.Write([]byte(fmt.Sprintf("    'success': %t,\n", success)))
+    rw.Write([]byte("    'namespaces': {\n"))
+    var i    int = 0
+    var last int = len(result)-1
+    for key, value := range result {
+        if i==last {
+            rw.Write([]byte(fmt.Sprintf("        '%s': '%s'\n", key, value)))
+        } else {
+            rw.Write([]byte(fmt.Sprintf("        '%s': '%s',\n", key, value)))
+        }
+        i++
+    }
+    rw.Write([]byte("    }\n"))
+    rw.Write([]byte("}\n"))
 }
 
 func query_handler (rw http.ResponseWriter, request *http.Request) {

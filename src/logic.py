@@ -99,7 +99,7 @@ def namespaces ():
     try:
         namespaces = {}
         for prefix, namespace in m.namespaces():
-            namespaces[prefix] = namespace
+            namespaces[str(prefix)] = str(namespace)
         return True, namespaces
     except Exception as e:
         return False, str(e)
