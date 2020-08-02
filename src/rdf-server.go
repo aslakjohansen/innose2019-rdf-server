@@ -65,11 +65,10 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
         rw.Write([]byte("}\n"))
         return
     }
-    var query_str string = string(query)
-    var query_len int    = len(query_str)
     
-    // guard: proper string
-    if len(query_str)<2 || query_str[0]!='"' || query_str[query_len-1]!='"' {
+    var query_str string
+    err = json.Unmarshal(query, &query_str)
+    if err!=nil {
         rw.Write([]byte("{\n"))
         rw.Write([]byte("    'success': false,\n"))
         rw.Write([]byte("    'error': 'malformed query'\n"))
@@ -79,7 +78,7 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
     
     var success bool
     var result [][]string
-    result, success = Query(query_str[1:query_len-1])
+    result, success = Query(query_str)
     
     if success==false {
         rw.Write([]byte("{\n"))
