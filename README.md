@@ -2,11 +2,10 @@
 
 ## Requirements
 
-- Python 3.5+
-- Python modules:
-  - `asyncio`
-  - `aiohttp`
-  - `json`
+- The `python2.7-dev` package (as it is a dependency for go-python)
+- The following python 2.7 modules:
+  - `rdflib` (both 4.2.2 and 5.0.0 have been tested)
+  - `requests` (for some reason rdflib makes use of it without depending on it)
 
 ## Running
 
