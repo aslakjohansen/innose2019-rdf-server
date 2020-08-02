@@ -136,6 +136,20 @@ func Query (q string) ([][]string, bool) {
     return result, success;
 }
 
+func Update (q string) (bool, bool) {
+    state, gstate := enter()
+    
+    // construct arguments
+    args := python.PyTuple_New(1)
+    python.PyTuple_SET_ITEM(args, 0, python.PyString_FromString(q))
+    
+    resPython := python_update.Call(args, python.PyDict_New())
+    success, _ := unpack(resPython)
+    
+    leave(state, gstate)
+    return success, success;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////// helpers
 

@@ -4,6 +4,7 @@ import (
     "fmt"
     "io/ioutil"
     "net/http"
+    "encoding/json"
 )
 
 var (
@@ -114,13 +115,45 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
 }
 
 func update_handler (rw http.ResponseWriter, request *http.Request) {
-    input, err := ioutil.ReadAll(request.Body)
+    query, err := ioutil.ReadAll(request.Body)
     if err != nil {
-        fmt.Println(err)
+        rw.Write([]byte("{\n"))
+        rw.Write([]byte("    'success': false,\n"))
+        rw.Write([]byte("    'error': 'unable to read query'\n"))
+        rw.Write([]byte("}\n"))
+        return
     }
-    var inputString string = string(input)
+    var query_str string
+    err = json.Unmarshal(query, &query_str)
+    if err!=nil {
+        rw.Write([]byte("{\n"))
+        rw.Write([]byte("    'success': false,\n"))
+        rw.Write([]byte("    'error': 'malformed query'\n"))
+        rw.Write([]byte("}\n"))
+        return
+    }
     
-    rw.Write([]byte(inputString))
+    
+//    var query_str string = string(query)
+//    var query_len int    = len(query_str)
+//    
+//    // guard: proper string
+//    if len(query_str)<2 || query_str[0]!='"' || query_str[query_len-1]!='"' {
+//        rw.Write([]byte("{\n"))
+//        rw.Write([]byte("    'success': false,\n"))
+//        rw.Write([]byte("    'error': 'malformed query'\n"))
+//        rw.Write([]byte("}\n"))
+//        return
+//    }
+    
+    var success bool
+//    var result  bool
+//    _, success = Update(query_str[1:query_len-1])
+    _, success = Update(query_str)
+    
+    rw.Write([]byte("{\n"))
+    rw.Write([]byte(fmt.Sprintf("    'success': %t,\n", success)))
+    rw.Write([]byte("}\n"))
 }
 
 ///////////////////////////////////////////////////////////////////////////////
