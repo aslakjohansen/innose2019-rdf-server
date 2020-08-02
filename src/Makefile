@@ -2,7 +2,7 @@ TARGETS = \
 	rdf-server \
 
 
-all: ${TARGETS}
+all: ${TARGETS} ../var/model
 	PYTHONPATH=. ./rdf-server
 
 clean:
@@ -16,6 +16,9 @@ mrproper:
 deps:
 	go get github.com/sbinet/go-python
 
+
+../var/model:
+	mkdir ../var/model
 
 rdf-server: rdf-server.go logic.go
 	go build -x rdf-server.go logic.go
