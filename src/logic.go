@@ -277,7 +277,6 @@ func unpack_string2string (tuple *python.PyObject) (bool, map[string]string) {
     }
     
     size := python.PyList_GET_SIZE(items)
-    fmt.Println("Number of namespaces", size)
     
     // construct map
     var res map[string]string = make(map[string]string)
@@ -350,7 +349,6 @@ func unpack_string2d (tuple *python.PyObject) (bool, [][]string) {
     }
     
     row_count := python.PyList_GET_SIZE(result)
-    fmt.Println("Number of rows", row_count)
     
     var col_count int
     var res       [][]string = make([][]string, row_count)
