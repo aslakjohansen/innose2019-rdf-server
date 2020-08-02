@@ -123,6 +123,7 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
         rw.Write([]byte("}\n"))
         return
     }
+    
     var query_str string
     err = json.Unmarshal(query, &query_str)
     if err!=nil {
@@ -133,22 +134,7 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
         return
     }
     
-    
-//    var query_str string = string(query)
-//    var query_len int    = len(query_str)
-//    
-//    // guard: proper string
-//    if len(query_str)<2 || query_str[0]!='"' || query_str[query_len-1]!='"' {
-//        rw.Write([]byte("{\n"))
-//        rw.Write([]byte("    'success': false,\n"))
-//        rw.Write([]byte("    'error': 'malformed query'\n"))
-//        rw.Write([]byte("}\n"))
-//        return
-//    }
-    
     var success bool
-//    var result  bool
-//    _, success = Update(query_str[1:query_len-1])
     _, success = Update(query_str)
     
     rw.Write([]byte("{\n"))

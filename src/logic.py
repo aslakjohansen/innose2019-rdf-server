@@ -114,12 +114,9 @@ def query (q):
         return False, str(e)
 
 def update (q):
-    print(q)
     try:
         m.update(q)
-        print(True, None)
         return True, None
     except Exception as e:
-        print(False, str(e))
         return False, str(e)
 
