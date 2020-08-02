@@ -110,7 +110,8 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
             rw.Write([]byte("        ],\n"))
         }
     }
-    rw.Write([]byte("]\n"))
+    rw.Write([]byte("    ]\n"))
+    rw.Write([]byte("}\n"))
 }
 
 func update_handler (rw http.ResponseWriter, request *http.Request) {
@@ -137,7 +138,7 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
     _, success = Update(query_str)
     
     rw.Write([]byte("{\n"))
-    rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
+    rw.Write([]byte(fmt.Sprintf("    \"success\": %t\n", success)))
     rw.Write([]byte("}\n"))
 }
 
