@@ -1,6 +1,7 @@
 package main
 
 import (
+    "os"
     "fmt"
     "io/ioutil"
     "net/http"
@@ -146,7 +147,18 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
 ////////////////////////////////////////////////////////////////////////// main
 
 func main () {
-    var port int16 = 8001
+//    var port int16 = 8001
+    
+    // guard: command line arguments
+    if (len(os.Args) != 5) {
+        fmt.Println("Syntax: "+os.Args[0]+" INTERFACE PORT MODEL_DIR ONTOLOGY_DIR")
+        fmt.Println("        "+os.Args[0]+" 0.0.0.0 8001 ../var/model ../var/ontologies")
+        os.Exit(1)
+    }
+    var iface string = os.Args[1]
+    var port  string = os.Args[2]
+        model_dir    = os.Args[3]
+        ontology_dir = os.Args[4]
     
     Init(model_dir, ontology_dir)
     
@@ -157,10 +169,10 @@ func main () {
         http.HandleFunc("/query"     , query_handler)
         http.HandleFunc("/update"    , update_handler)
         
-        fmt.Println(fmt.Sprintf("Listening to localhost:%d", port))
         
         // start listening
-        var endpoint string = fmt.Sprintf(":%d", port)
+        var endpoint string = fmt.Sprintf("%s:%s", iface, port)
+        fmt.Println(fmt.Sprintf("Listening to %s", endpoint))
         err := http.ListenAndServe(endpoint, nil)
         if err != nil {
             fmt.Println(err)
