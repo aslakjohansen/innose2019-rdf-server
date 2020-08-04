@@ -6,11 +6,13 @@ import (
     "io/ioutil"
     "net/http"
     "encoding/json"
+    "github.com/gorilla/websocket"
 )
 
 var (
     model_dir    string = "../var/model"
     ontology_dir string = "../var/ontologies"
+    upgrader            = websocket.Upgrader{}
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -143,6 +145,36 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
     rw.Write([]byte("}\n"))
 }
 
+func websocket_handler (rw http.ResponseWriter, request *http.Request) {
+    // upgrade connection
+    ws, err := upgrader.Upgrade(rw, request, nil)
+    if err!=nil {
+        fmt.Println("Warn: Unable to upgrade to websocket:", err)
+        return
+    }
+    defer ws.Close()
+    
+    // enter service loop
+    for {
+        // receive
+        mt, message, err := ws.ReadMessage()
+        if err!=nil {
+            fmt.Println("Warn: Unable to receive through websocket:", err)
+            return
+        }
+        
+        // print to screen
+        fmt.Println("Received: '", message, "'")
+        
+        // echo back for now
+        err = ws.WriteMessage(mt, message)
+        if err!=nil {
+            fmt.Println("Warn: Unable to send through websocket:", err)
+            return
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////// main
 
@@ -168,6 +200,7 @@ func main () {
         http.HandleFunc("/namespaces", namespace_handler)
         http.HandleFunc("/query"     , query_handler)
         http.HandleFunc("/update"    , update_handler)
+        http.HandleFunc("/websocket" , websocket_handler)
         
         
         // start listening

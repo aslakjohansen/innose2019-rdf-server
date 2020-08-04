@@ -15,6 +15,7 @@ mrproper:
 
 deps:
 	go get github.com/sbinet/go-python
+	go get github.com/gorilla/websocket
 
 
 ../var/model:
