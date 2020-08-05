@@ -1,4 +1,5 @@
 TARGETS = \
+	rdf-client \
 	rdf-server \
 
 
@@ -20,6 +21,9 @@ deps:
 
 ../var/model:
 	mkdir ../var/model
+
+rdf-client: rdf-client.go
+	go build -x rdf-client.go
 
 rdf-server: rdf-server.go logic.go
 	go build -x rdf-server.go logic.go
