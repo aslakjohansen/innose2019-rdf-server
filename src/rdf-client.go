@@ -6,6 +6,7 @@ import (
     "os/signal"
     "sync"
     "time"
+    "bufio"
     
     "github.com/gorilla/websocket"
 )
@@ -14,6 +15,25 @@ var (
     buffer       []string   = make([]string, 0)
     buffer_mutex sync.Mutex
 )
+
+func buffer_add (entry string) {
+    buffer_mutex.Lock()
+    fmt.Println("Adding", entry)
+    buffer = append(buffer, string(entry))
+    buffer_mutex.Unlock()
+}
+
+func buffer_remove () *string {
+    var line *string = nil
+    buffer_mutex.Lock()
+    if len(buffer)>0 {
+        line = &buffer[0]
+        buffer = buffer[1:]
+        fmt.Println("Removing", *line)
+    }
+    buffer_mutex.Unlock()
+    return line
+}
 
 func receiver (con *websocket.Conn, receiver_closed chan struct{}, sender_closed *bool) {
     defer close(receiver_closed)
@@ -29,9 +49,20 @@ func receiver (con *websocket.Conn, receiver_closed chan struct{}, sender_closed
         }
         
         // add to input buffer
-        buffer_mutex.Lock()
-        buffer = append(buffer, string(message))
-        buffer_mutex.Unlock()
+        buffer_add(string(message))
+    }
+}
+
+func command_reader (command_channel chan string) {
+    reader := bufio.NewReader(os.Stdin)
+    for {
+        fmt.Print(">> ")
+        line, err := reader.ReadString('\n')
+        if err!=nil {
+            fmt.Println("Error: Unable to read input:", err)
+            return
+        }
+        command_channel <- line
     }
 }
 
@@ -48,6 +79,7 @@ func main () {
     // setup signal handler for ^C
     var interrupt       chan os.Signal = make(chan os.Signal, 1)
     var receiver_closed chan struct{}  = make(chan struct{})
+    var command_channel chan string    = make(chan string)
     var sender_closed   bool           = false
     signal.Notify(interrupt, os.Interrupt)
     
@@ -64,10 +96,28 @@ func main () {
     defer con.Close()
     
     go receiver(con, receiver_closed, &sender_closed)
+    go command_reader(command_channel)
     
     // main loop
     for {
         select {
+            case command := <-command_channel:
+                if command=="\n" {
+                    for {
+                        entry := buffer_remove()
+                        if entry==nil {
+                            break
+                        }
+                        fmt.Println(*entry)
+                    }
+                } else {
+                    fmt.Println("sending", command)
+                    err := con.WriteMessage(websocket.TextMessage, []byte(command))
+                    if err != nil {
+                        fmt.Println("Error: Unable to write message", err)
+                        return
+                    }
+                }
             case <-receiver_closed:
                 return
             case <-interrupt:
