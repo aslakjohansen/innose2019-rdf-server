@@ -68,7 +68,7 @@ func main () {
             case <-receiver_closed:
                 return
             case <-interrupt:
-                fmt.Println("^C")
+                fmt.Println("")
                 
                 // send close message
                 err := con.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
