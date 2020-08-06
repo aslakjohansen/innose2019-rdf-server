@@ -15,14 +15,16 @@ var (
     buffer_mutex sync.Mutex
 )
 
-func receiver (con *websocket.Conn, receiver_closed chan struct{}) {
+func receiver (con *websocket.Conn, receiver_closed chan struct{}, sender_closed *bool) {
     defer close(receiver_closed)
     
     for {
         // read a single message
         _, message, err := con.ReadMessage()
         if err != nil {
-            fmt.Println("Error: Unable to read", err)
+            if !*sender_closed {
+                fmt.Println("Error: Unable to read", err)
+            }
             return
         }
         
@@ -46,6 +48,7 @@ func main () {
     // setup signal handler for ^C
     var interrupt       chan os.Signal = make(chan os.Signal, 1)
     var receiver_closed chan struct{}  = make(chan struct{})
+    var sender_closed   bool           = false
     signal.Notify(interrupt, os.Interrupt)
     
     // url
@@ -60,7 +63,7 @@ func main () {
     }
     defer con.Close()
     
-    go receiver(con, receiver_closed)
+    go receiver(con, receiver_closed, &sender_closed)
     
     // main loop
     for {
@@ -68,6 +71,7 @@ func main () {
             case <-receiver_closed:
                 return
             case <-interrupt:
+                sender_closed = true
                 fmt.Println("")
                 
                 // send close message
