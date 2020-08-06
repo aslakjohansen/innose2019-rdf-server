@@ -159,7 +159,9 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
         // receive
         mt, message, err := ws.ReadMessage()
         if err!=nil {
-            fmt.Println("Warn: Unable to receive through websocket:", err)
+            if err.Error()!="websocket: close 1000 (normal)" {
+                fmt.Println("Warn: Unable to receive through websocket:", err)
+            }
             return
         }
         
