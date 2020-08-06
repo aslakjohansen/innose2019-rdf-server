@@ -56,6 +56,7 @@ func main () {
     con, _, err := websocket.DefaultDialer.Dial(url, nil)
     if err != nil {
         fmt.Println("Error: Unable to connect:", err)
+        return
     }
     defer con.Close()
     
