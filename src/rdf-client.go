@@ -18,7 +18,6 @@ var (
 
 func buffer_add (entry string) {
     buffer_mutex.Lock()
-    fmt.Println("Adding", entry)
     buffer = append(buffer, string(entry))
     buffer_mutex.Unlock()
 }
@@ -29,7 +28,6 @@ func buffer_remove () *string {
     if len(buffer)>0 {
         line = &buffer[0]
         buffer = buffer[1:]
-        fmt.Println("Removing", *line)
     }
     buffer_mutex.Unlock()
     return line
@@ -111,7 +109,7 @@ func main () {
                         fmt.Println(*entry)
                     }
                 } else {
-                    fmt.Println("sending", command)
+//                    fmt.Println("sending", command)
                     err := con.WriteMessage(websocket.TextMessage, []byte(command))
                     if err != nil {
                         fmt.Println("Error: Unable to write message", err)
