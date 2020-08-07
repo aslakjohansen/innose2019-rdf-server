@@ -109,7 +109,7 @@ func main () {
     }
     history_filename = home+"/.rdf-client_history"
     
-    // setup signal handler for ^C
+    // variables
     var interrupt       chan os.Signal = make(chan os.Signal, 2)
     var receiver_closed chan struct{}  = make(chan struct{})
     var command_channel chan string    = make(chan string)
