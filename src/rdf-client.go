@@ -2,18 +2,21 @@ package main
 
 import (
     "os"
+//    "os/user"
     "fmt"
     "os/signal"
     "sync"
     "time"
-    "bufio"
+//    "bufio"
     
     "github.com/gorilla/websocket"
+    "github.com/peterh/liner"
 )
 
 var (
-    buffer       []string   = make([]string, 0)
-    buffer_mutex sync.Mutex
+    history_filename   string
+    buffer           []string = make([]string, 0)
+    buffer_mutex       sync.Mutex
 )
 
 func buffer_add (entry string) {
@@ -51,15 +54,45 @@ func receiver (con *websocket.Conn, receiver_closed chan struct{}, sender_closed
     }
 }
 
-func command_reader (command_channel chan string) {
-    reader := bufio.NewReader(os.Stdin)
+func command_reader (command_channel chan string, interrupt_channel chan os.Signal) {
+    line_handler := liner.NewLiner()
+    line_handler.SetCtrlCAborts(true)
+    defer line_handler.Close()
+    
+    // load history
+    if _, err := os.Stat(history_filename); !os.IsNotExist(err) {
+        if fo, err := os.Open(history_filename); err == nil {
+            line_handler.ReadHistory(fo)
+            fo.Close()
+        }
+    }
+    
+    // main loop
+//    reader := bufio.NewReader(os.Stdin)
     for {
-        fmt.Print(">> ")
-        line, err := reader.ReadString('\n')
+        line, err := line_handler.Prompt(">> ")
+//        fmt.Print(">> ")
+//        line, err := reader.ReadString('\n')
         if err!=nil {
-            fmt.Println("Error: Unable to read input:", err)
+            if err!=liner.ErrPromptAborted {
+                fmt.Println("Error: Unable to read input:", err)
+            }
+            interrupt_channel <- os.Interrupt
             return
         }
+        
+        line_handler.AppendHistory(line)
+        
+        // store history
+        fo, err := os.Create(history_filename)
+        if err!=nil {
+            fmt.Println("Error: Unable to create history file:", err)
+            interrupt_channel <- os.Interrupt
+            return
+        }
+        line_handler.WriteHistory(fo)
+        fo.Close()
+        
         command_channel <- line
     }
 }
@@ -74,8 +107,16 @@ func main () {
     var iface string = os.Args[1]
     var port  string = os.Args[2]
     
+    // build history filename
+    home, err := os.UserHomeDir()
+    if err!=nil {
+        fmt.Println("Error: Unable to determine home directory of user:", err)
+        return
+    }
+    history_filename = home+"/.rdf-client_history"
+    
     // setup signal handler for ^C
-    var interrupt       chan os.Signal = make(chan os.Signal, 1)
+    var interrupt       chan os.Signal = make(chan os.Signal, 2)
     var receiver_closed chan struct{}  = make(chan struct{})
     var command_channel chan string    = make(chan string)
     var sender_closed   bool           = false
@@ -94,13 +135,13 @@ func main () {
     defer con.Close()
     
     go receiver(con, receiver_closed, &sender_closed)
-    go command_reader(command_channel)
+    go command_reader(command_channel, interrupt)
     
     // main loop
     for {
         select {
             case command := <-command_channel:
-                if command=="\n" {
+                if command=="\n" || command=="" {
                     for {
                         entry := buffer_remove()
                         if entry==nil {
