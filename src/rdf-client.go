@@ -2,12 +2,10 @@ package main
 
 import (
     "os"
-//    "os/user"
     "fmt"
     "os/signal"
     "sync"
     "time"
-//    "bufio"
     
     "github.com/gorilla/websocket"
     "github.com/peterh/liner"
@@ -68,11 +66,8 @@ func command_reader (command_channel chan string, interrupt_channel chan os.Sign
     }
     
     // main loop
-//    reader := bufio.NewReader(os.Stdin)
     for {
         line, err := line_handler.Prompt(">> ")
-//        fmt.Print(">> ")
-//        line, err := reader.ReadString('\n')
         if err!=nil {
             if err!=liner.ErrPromptAborted {
                 fmt.Println("Error: Unable to read input:", err)
@@ -150,7 +145,6 @@ func main () {
                         fmt.Println(*entry)
                     }
                 } else {
-//                    fmt.Println("sending", command)
                     err := con.WriteMessage(websocket.TextMessage, []byte(command))
                     if err != nil {
                         fmt.Println("Error: Unable to write message", err)
