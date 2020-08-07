@@ -3,7 +3,6 @@ package main
 import (
     "os"
     "fmt"
-    "os/signal"
     "sync"
     "time"
     
@@ -115,7 +114,6 @@ func main () {
     var receiver_closed chan struct{}  = make(chan struct{})
     var command_channel chan string    = make(chan string)
     var sender_closed   bool           = false
-    signal.Notify(interrupt, os.Interrupt)
     
     // url
     var url string = fmt.Sprintf("ws://%s:%s/websocket", iface, port)
