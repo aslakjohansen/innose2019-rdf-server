@@ -204,7 +204,6 @@ func main () {
         http.HandleFunc("/update"    , update_handler)
         http.HandleFunc("/websocket" , websocket_handler)
         
-        
         // start listening
         var endpoint string = fmt.Sprintf("%s:%s", iface, port)
         fmt.Println(fmt.Sprintf("Listening to %s", endpoint))
