@@ -17,8 +17,6 @@ var (
 ////////////////////////////////////////////////////////////////////////// main
 
 func main () {
-//    var port int16 = 8001
-    
     // guard: command line arguments
     if (len(os.Args) != 5) {
         fmt.Println("Syntax: "+os.Args[0]+" INTERFACE PORT MODEL_DIR ONTOLOGY_DIR")
