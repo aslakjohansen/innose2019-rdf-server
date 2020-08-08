@@ -9,6 +9,7 @@ import (
     "github.com/gorilla/websocket"
     
     "innose2019-rdf-server/logic"
+    "innose2019-rdf-server/command"
 )
 
 var (
@@ -47,13 +48,26 @@ func Finalize () {
 ////////////////////////////////////////////////////////////////////// handlers
 
 func time_handler (rw http.ResponseWriter, request *http.Request) {
-    var result float64
-    var success bool
-    result, success = logic.Time()
-    rw.Write([]byte("{\n"))
-    rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
-    rw.Write([]byte(fmt.Sprintf("    \"time\": %f\n", result)))
-    rw.Write([]byte("}\n"))
+    fmt.Println("a")
+//    go func (rw http.ResponseWriter) {
+        fmt.Println("b")
+        var result_channel chan []byte = make(chan []byte)
+        fmt.Println("c")
+        go command.Time(result_channel)
+        fmt.Println("d")
+        var result []byte = <- result_channel
+        fmt.Println("e", result)
+        rw.Write(result)
+        fmt.Println("f")
+//    }(rw)
+    fmt.Println("g")
+//    var result float64
+//    var success bool
+//    result, success = logic.Time()
+//    rw.Write([]byte("{\n"))
+//    rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
+//    rw.Write([]byte(fmt.Sprintf("    \"time\": %f\n", result)))
+//    rw.Write([]byte("}\n"))
 }
 
 func store_handler (rw http.ResponseWriter, request *http.Request) {
