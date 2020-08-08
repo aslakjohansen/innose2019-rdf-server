@@ -26,6 +26,6 @@ deps:
 rdf-client: rdf-client.go
 	go build -x rdf-client.go
 
-rdf-server: rdf-server.go logic.go
-	go build -x rdf-server.go logic.go
+rdf-server: rdf-server.go
+	go build -x rdf-server.go
 

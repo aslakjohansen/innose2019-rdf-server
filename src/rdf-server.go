@@ -7,6 +7,8 @@ import (
     "net/http"
     "encoding/json"
     "github.com/gorilla/websocket"
+    
+    "innose2019-rdf-server/logic"
 )
 
 var (
@@ -21,7 +23,7 @@ var (
 func time_handler (rw http.ResponseWriter, request *http.Request) {
     var result float64
     var success bool
-    result, success = Time()
+    result, success = logic.Time()
     rw.Write([]byte("{\n"))
     rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
     rw.Write([]byte(fmt.Sprintf("    \"time\": %f\n", result)))
@@ -31,7 +33,7 @@ func time_handler (rw http.ResponseWriter, request *http.Request) {
 func store_handler (rw http.ResponseWriter, request *http.Request) {
     var success bool
     var result string
-    result, success = Store(model_dir)
+    result, success = logic.Store(model_dir)
     rw.Write([]byte("{\n"))
     rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
     rw.Write([]byte(fmt.Sprintf("    \"filename\": %s\n", result)))
@@ -41,7 +43,7 @@ func store_handler (rw http.ResponseWriter, request *http.Request) {
 func namespace_handler (rw http.ResponseWriter, request *http.Request) {
     var success bool
     var result map[string]string
-    result, success = Namespaces()
+    result, success = logic.Namespaces()
     rw.Write([]byte("{\n"))
     rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
     rw.Write([]byte("    \"namespaces\": {\n"))
@@ -81,7 +83,7 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
     
     var success bool
     var result [][]string
-    result, success = Query(query_str)
+    result, success = logic.Query(query_str)
     
     if success==false {
         rw.Write([]byte("{\n"))
@@ -138,7 +140,7 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
     }
     
     var success bool
-    _, success = Update(query_str)
+    _, success = logic.Update(query_str)
     
     rw.Write([]byte("{\n"))
     rw.Write([]byte(fmt.Sprintf("    \"success\": %t\n", success)))
@@ -194,7 +196,7 @@ func main () {
         model_dir    = os.Args[3]
         ontology_dir = os.Args[4]
     
-    Init(model_dir, ontology_dir)
+    logic.Init(model_dir, ontology_dir)
     
     go func () {
         http.HandleFunc("/time"      , time_handler)
@@ -214,5 +216,5 @@ func main () {
     }()
     
     select{} // block forever
-    Finalize()
+    logic.Finalize()
 }
