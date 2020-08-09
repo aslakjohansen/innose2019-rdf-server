@@ -48,19 +48,10 @@ func Finalize () {
 ////////////////////////////////////////////////////////////////////// handlers
 
 func time_handler (rw http.ResponseWriter, request *http.Request) {
-    fmt.Println("a")
-//    go func (rw http.ResponseWriter) {
-        fmt.Println("b")
-        var result_channel chan []byte = make(chan []byte)
-        fmt.Println("c")
+        var result_channel chan string = make(chan string)
         go command.Time(result_channel)
-        fmt.Println("d")
-        var result []byte = <- result_channel
-        fmt.Println("e", result)
-        rw.Write(result)
-        fmt.Println("f")
-//    }(rw)
-    fmt.Println("g")
+        var result string = <- result_channel
+        rw.Write([]byte(result))
 //    var result float64
 //    var success bool
 //    result, success = logic.Time()
