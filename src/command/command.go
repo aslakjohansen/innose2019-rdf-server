@@ -6,7 +6,6 @@ import (
     "innose2019-rdf-server/logic"
 )
 
-//func Time (result_channel chan string, indent string) string {
 func Time (indent string) string {
     var value float64
     var success bool
@@ -19,6 +18,5 @@ func Time (indent string) string {
     result += fmt.Sprintf("%s}\n", indent)
     
     return result
-//    result_channel <- result
 }
 
