@@ -184,7 +184,6 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     var response_channel chan []byte = make(chan []byte)
     go func () {
         for response := range response_channel {
-            fmt.Println("response received:", string(response))
             err = ws.WriteMessage(websocket.TextMessage, response)
             if err!=nil {
                 fmt.Println("Warn: Unable to send through websocket:", err)

@@ -22,7 +22,6 @@ type TimeEntry struct {
     Entry
 }
 func (e *TimeEntry) Handle (response_channel chan []byte) {
-    fmt.Println("dispatch:time")
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
@@ -30,16 +29,13 @@ func (e *TimeEntry) Handle (response_channel chan []byte) {
     response += fmt.Sprintf("%s", command.Time("        "))
     response += fmt.Sprintf("}\n")
     
-    fmt.Println("dispatch:time:before")
     response_channel <- []byte(response)
-    fmt.Println("dispatch:time:after")
 }
 
 type StoreEntry struct {
     Entry
 }
 func (e *StoreEntry) Handle (response_channel chan []byte) {
-    fmt.Println("dispatch:store")
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
@@ -47,9 +43,7 @@ func (e *StoreEntry) Handle (response_channel chan []byte) {
     response += fmt.Sprintf("%s", command.Store("        ", model_dir))
     response += fmt.Sprintf("}\n")
     
-    fmt.Println("dispatch:store:before")
     response_channel <- []byte(response)
-    fmt.Println("dispatch:store:before")
 }
 
 ///////////////////////////////////////////////////////////////////////////////
