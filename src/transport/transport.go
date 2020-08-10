@@ -48,9 +48,11 @@ func Finalize () {
 ////////////////////////////////////////////////////////////////////// handlers
 
 func time_handler (rw http.ResponseWriter, request *http.Request) {
-        var result_channel chan string = make(chan string)
-        go command.Time(result_channel)
-        var result string = <- result_channel
+//        var result_channel chan string = make(chan string)
+//        go command.Time(result_channel, "")
+//        var result string = <- result_channel
+        var result string = command.Time("")
+//        var result string = command.Time(result_channel, "")
         rw.Write([]byte(result))
 //    var result float64
 //    var success bool
@@ -187,10 +189,22 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     }
     defer ws.Close()
     
+    // response handling
+    var response_channel chan []byte = make(chan []byte)
+    go func () {
+        for response := range response_channel {
+            err = ws.WriteMessage(websocket.TextMessage, response)
+            if err!=nil {
+                fmt.Println("Warn: Unable to send through websocket:", err)
+                return
+            }
+        }
+    }()
+    
     // enter service loop
     for {
         // receive
-        mt, message, err := ws.ReadMessage()
+        _, message, err := ws.ReadMessage()
         if err!=nil {
             if err.Error()!="websocket: close 1000 (normal)" {
                 fmt.Println("Warn: Unable to receive through websocket:", err)
@@ -200,13 +214,14 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
         
         // print to screen
         fmt.Println("Received: '", message, "'")
+        go Dispatch(message, response_channel)
         
-        // echo back for now
-        err = ws.WriteMessage(mt, message)
-        if err!=nil {
-            fmt.Println("Warn: Unable to send through websocket:", err)
-            return
-        }
+//        // echo back for now
+//        err = ws.WriteMessage(mt, message)
+//        if err!=nil {
+//            fmt.Println("Warn: Unable to send through websocket:", err)
+//            return
+//        }
     }
 }
 
