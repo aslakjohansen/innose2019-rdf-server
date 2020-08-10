@@ -55,13 +55,6 @@ func time_handler (rw http.ResponseWriter, request *http.Request) {
 func store_handler (rw http.ResponseWriter, request *http.Request) {
     var result string = command.Store("", model_dir)
     rw.Write([]byte(result))
-//    var success bool
-//    var result string
-//    result, success = logic.Store(*model_dir)
-//    rw.Write([]byte("{\n"))
-//    rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
-//    rw.Write([]byte(fmt.Sprintf("    \"filename\": %s\n", result)))
-//    rw.Write([]byte("}\n"))
 }
 
 func namespace_handler (rw http.ResponseWriter, request *http.Request) {
