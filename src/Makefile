@@ -1,4 +1,5 @@
 TARGETS = \
+	rdf-client \
 	rdf-server \
 
 
@@ -15,11 +16,16 @@ mrproper:
 
 deps:
 	go get github.com/sbinet/go-python
+	go get github.com/gorilla/websocket
+	go get github.com/peterh/liner
 
 
 ../var/model:
 	mkdir ../var/model
 
-rdf-server: rdf-server.go logic.go
-	go build -x rdf-server.go logic.go
+rdf-client: rdf-client.go
+	go build -x rdf-client.go
+
+rdf-server: rdf-server.go */*.go
+	go build -x rdf-server.go
 

@@ -1,8 +1,9 @@
-package main
+package logic
 
 import (
     "runtime"
     "fmt"
+    "sync"
     python "github.com/sbinet/go-python"
 )
 
@@ -14,6 +15,7 @@ var (
     python_namespaces *python.PyObject
     python_query      *python.PyObject
     python_update     *python.PyObject
+    mutex sync.Mutex
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -154,6 +156,7 @@ func Update (q string) (bool, bool) {
 /////////////////////////////////////////////////////////////////////// helpers
 
 func enter () (*python.PyThreadState, python.PyGILState) {
+    mutex.Lock()
     var state  *python.PyThreadState = python.PyEval_SaveThread()
     var gstate  python.PyGILState    = python.PyGILState_Ensure()
     return state, gstate
@@ -162,6 +165,7 @@ func enter () (*python.PyThreadState, python.PyGILState) {
 func leave (state *python.PyThreadState, gstate python.PyGILState) {
     python.PyGILState_Release(gstate)
     python.PyEval_RestoreThread(state)
+    mutex.Unlock()
 }
 
 func unpack (tuple *python.PyObject) (bool, *python.PyObject) {
