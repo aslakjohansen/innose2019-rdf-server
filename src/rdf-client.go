@@ -14,6 +14,7 @@ var (
     history_filename   string
     buffer           []string = make([]string, 0)
     buffer_mutex       sync.Mutex
+    line_handler      *liner.State
 )
 
 func buffer_add (entry string) {
@@ -52,7 +53,7 @@ func receiver (con *websocket.Conn, receiver_closed chan struct{}, sender_closed
 }
 
 func command_reader (command_channel chan string, interrupt_channel chan os.Signal) {
-    line_handler := liner.NewLiner()
+    line_handler = liner.NewLiner()
     line_handler.SetCtrlCAborts(true)
     defer line_handler.Close()
     
@@ -150,6 +151,9 @@ func main () {
                     }
                 }
             case <-receiver_closed:
+                // reset terminal
+                line_handler.Close()
+                
                 return
             case <-interrupt:
                 sender_closed = true
