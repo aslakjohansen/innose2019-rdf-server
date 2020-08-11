@@ -1,15 +1,13 @@
-package command
+package logic
 
 import (
     "fmt"
-    
-    "innose2019-rdf-server/logic"
 )
 
-func Time (indent string) string {
+func JsonTime (indent string) string {
     var value float64
     var success bool
-    value, success = logic.Time()
+    value, success = Time()
     
     var response string = ""
     response += fmt.Sprintf("{\n")
@@ -20,10 +18,10 @@ func Time (indent string) string {
     return response
 }
 
-func Store (indent string, model_dir *string) string {
+func JsonStore (indent string, model_dir *string) string {
     var success bool
     var result string
-    result, success = logic.Store(*model_dir)
+    result, success = Store(*model_dir)
     
     var response string = ""
     response += fmt.Sprintf("{\n")
@@ -34,10 +32,10 @@ func Store (indent string, model_dir *string) string {
     return response
 }
 
-func Namespaces (indent string) string {
+func JsonNamespaces (indent string) string {
     var success bool
     var result map[string]string
-    result, success = logic.Namespaces()
+    result, success = Namespaces()
     
     var response string = ""
     response += fmt.Sprintf("{\n")
@@ -59,10 +57,10 @@ func Namespaces (indent string) string {
     return response
 }
 
-func Query (indent string, query string) string {
+func JsonQuery (indent string, query string) string {
     var success bool
     var result [][]string
-    result, success = logic.Query(query)
+    result, success = Query(query)
     
     var response string = ""
     
@@ -102,9 +100,9 @@ func Query (indent string, query string) string {
     return response
 }
 
-func Update (indent string, query string) string {
+func JsonUpdate (indent string, query string) string {
     var success bool
-    _, success = logic.Update(query)
+    _, success = Update(query)
     
     var response string = ""
     response += fmt.Sprintf("{\n")

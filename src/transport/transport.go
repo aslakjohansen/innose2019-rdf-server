@@ -9,7 +9,7 @@ import (
     
     "github.com/gorilla/websocket"
     
-    "innose2019-rdf-server/command"
+    "innose2019-rdf-server/logic"
 )
 
 var (
@@ -48,17 +48,17 @@ func Finalize () {
 ////////////////////////////////////////////////////////////////////// handlers
 
 func time_handler (rw http.ResponseWriter, request *http.Request) {
-    var result string = command.Time("")+"\n"
+    var result string = logic.JsonTime("")+"\n"
     rw.Write([]byte(result))
 }
 
 func store_handler (rw http.ResponseWriter, request *http.Request) {
-    var result string = command.Store("", model_dir)+"\n"
+    var result string = logic.JsonStore("", model_dir)+"\n"
     rw.Write([]byte(result))
 }
 
 func namespace_handler (rw http.ResponseWriter, request *http.Request) {
-    var result string = command.Namespaces("")+"\n"
+    var result string = logic.JsonNamespaces("")+"\n"
     rw.Write([]byte(result))
 }
 
@@ -82,7 +82,7 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
         return
     }
     
-    var result string = command.Query("", query_str)+"\n"
+    var result string = logic.JsonQuery("", query_str)+"\n"
     rw.Write([]byte(result))
 }
 
@@ -106,7 +106,7 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
         return
     }
     
-    var result string = command.Update("", query_str)+"\n"
+    var result string = logic.JsonUpdate("", query_str)+"\n"
     rw.Write([]byte(result))
 }
 

@@ -4,7 +4,7 @@ import (
     "fmt"
     "encoding/json"
     
-    "innose2019-rdf-server/command"
+    "innose2019-rdf-server/logic"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ func (e *TimeEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\": %s\n", command.Time("    "))
+    response += fmt.Sprintf("    \"response\": %s\n", logic.JsonTime("    "))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
@@ -38,7 +38,7 @@ func (e *StoreEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\": %s\n", command.Store("    ", model_dir))
+    response += fmt.Sprintf("    \"response\": %s\n", logic.JsonStore("    ", model_dir))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
@@ -51,7 +51,7 @@ func (e *NamespacesEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\": %s\n", command.Namespaces("    "))
+    response += fmt.Sprintf("    \"response\": %s\n", logic.JsonNamespaces("    "))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
@@ -65,7 +65,7 @@ func (e *QueryEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\": %s\n", command.Query("    ", e.Query))
+    response += fmt.Sprintf("    \"response\": %s\n", logic.JsonQuery("    ", e.Query))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
@@ -79,7 +79,7 @@ func (e *UpdateEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\": %s\n", command.Update("    ", e.Query))
+    response += fmt.Sprintf("    \"response\": %s\n", logic.JsonUpdate("    ", e.Query))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
