@@ -34,3 +34,27 @@ func Store (indent string, model_dir *string) string {
     return response
 }
 
+func Namespaces (indent string) string {
+    var success bool
+    var result map[string]string
+    result, success = logic.Namespaces()
+    
+    var response string = ""
+    response += fmt.Sprintf("%s{\n", indent)
+    response += fmt.Sprintf("%s    \"success\": %t,\n", indent, success)
+    response += fmt.Sprintf("%s    \"namespaces\": {\n", indent)
+    var i    int = 0
+    var last int = len(result)-1
+    for key, value := range result {
+        if i==last {
+            response += fmt.Sprintf("%s        \"%s\": \"%s\"\n", indent, key, value)
+        } else {
+            response += fmt.Sprintf("%s        \"%s\": \"%s\",\n", indent, key, value)
+        }
+        i++
+    }
+    response += fmt.Sprintf("%s    }\n", indent)
+    response += fmt.Sprintf("%s}\n", indent)
+    
+    return response
+}

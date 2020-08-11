@@ -46,6 +46,20 @@ func (e *StoreEntry) Handle (response_channel chan []byte) {
     response_channel <- []byte(response)
 }
 
+type NamespacesEntry struct {
+    Entry
+}
+func (e *NamespacesEntry) Handle (response_channel chan []byte) {
+    var response string = ""
+    response += fmt.Sprintf("{\n")
+    response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
+    response += fmt.Sprintf("    \"response\":\n")
+    response += fmt.Sprintf("%s", command.Namespaces("        "))
+    response += fmt.Sprintf("}\n")
+    
+    response_channel <- []byte(response)
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////// main dispatcher
 
@@ -70,6 +84,14 @@ func Dispatch (input []byte, response_channel chan []byte) {
         typed_entry.Handle(response_channel)
     case "store":
         var typed_entry StoreEntry
+        err := json.Unmarshal(input, &typed_entry)
+        if err!=nil {
+            fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
+            return
+        }
+        typed_entry.Handle(response_channel)
+    case "namespaces":
+        var typed_entry NamespacesEntry
         err := json.Unmarshal(input, &typed_entry)
         if err!=nil {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))

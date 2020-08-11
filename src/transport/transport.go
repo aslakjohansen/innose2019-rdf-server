@@ -58,24 +58,8 @@ func store_handler (rw http.ResponseWriter, request *http.Request) {
 }
 
 func namespace_handler (rw http.ResponseWriter, request *http.Request) {
-    var success bool
-    var result map[string]string
-    result, success = logic.Namespaces()
-    rw.Write([]byte("{\n"))
-    rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
-    rw.Write([]byte("    \"namespaces\": {\n"))
-    var i    int = 0
-    var last int = len(result)-1
-    for key, value := range result {
-        if i==last {
-            rw.Write([]byte(fmt.Sprintf("        \"%s\": \"%s\"\n", key, value)))
-        } else {
-            rw.Write([]byte(fmt.Sprintf("        \"%s\": \"%s\",\n", key, value)))
-        }
-        i++
-    }
-    rw.Write([]byte("    }\n"))
-    rw.Write([]byte("}\n"))
+    var result string = command.Namespaces("")
+    rw.Write([]byte(result))
 }
 
 func query_handler (rw http.ResponseWriter, request *http.Request) {
