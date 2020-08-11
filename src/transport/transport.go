@@ -82,42 +82,41 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
         return
     }
     
-    var success bool
-    var result [][]string
-    result, success = logic.Query(query_str)
+    var result string = command.Query("", query_str)
+    rw.Write([]byte(result))
     
-    if success==false {
-        rw.Write([]byte("{\n"))
-        rw.Write([]byte("    \"success\": false,\n"))
-        rw.Write([]byte("    \"error\": \"unable to evaluate query\"\n"))
-        rw.Write([]byte("}\n"))
-        return
-    }
-    
-    rw.Write([]byte("{\n"))
-    rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
-    rw.Write([]byte("    \"resultset\": [\n"))
-    for r:=0 ; r<len(result) ; r++ {
-        rw.Write([]byte("        [\n"))
-        
-        row := result[r]
-        for c:=0 ; c<len(row) ; c++ {
-            cell := row[c]
-            if c==len(row)-1 {
-                rw.Write([]byte(fmt.Sprintf("            \"%s\"\n", cell)))
-            } else {
-                rw.Write([]byte(fmt.Sprintf("            \"%s\",\n", cell)))
-            }
-        }
-        
-        if r==len(result)-1 {
-            rw.Write([]byte("        ]\n"))
-        } else {
-            rw.Write([]byte("        ],\n"))
-        }
-    }
-    rw.Write([]byte("    ]\n"))
-    rw.Write([]byte("}\n"))
+//    if success==false {
+//        rw.Write([]byte("{\n"))
+//        rw.Write([]byte("    \"success\": false,\n"))
+//        rw.Write([]byte("    \"error\": \"unable to evaluate query\"\n"))
+//        rw.Write([]byte("}\n"))
+//        return
+//    }
+//    
+//    rw.Write([]byte("{\n"))
+//    rw.Write([]byte(fmt.Sprintf("    \"success\": %t,\n", success)))
+//    rw.Write([]byte("    \"resultset\": [\n"))
+//    for r:=0 ; r<len(result) ; r++ {
+//        rw.Write([]byte("        [\n"))
+//        
+//        row := result[r]
+//        for c:=0 ; c<len(row) ; c++ {
+//            cell := row[c]
+//            if c==len(row)-1 {
+//                rw.Write([]byte(fmt.Sprintf("            \"%s\"\n", cell)))
+//            } else {
+//                rw.Write([]byte(fmt.Sprintf("            \"%s\",\n", cell)))
+//            }
+//        }
+//        
+//        if r==len(result)-1 {
+//            rw.Write([]byte("        ]\n"))
+//        } else {
+//            rw.Write([]byte("        ],\n"))
+//        }
+//    }
+//    rw.Write([]byte("    ]\n"))
+//    rw.Write([]byte("}\n"))
 }
 
 func update_handler (rw http.ResponseWriter, request *http.Request) {
