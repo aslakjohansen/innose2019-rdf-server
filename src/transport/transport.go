@@ -5,6 +5,7 @@ import (
     "net/http"
     "io/ioutil"
     "encoding/json"
+    "sync"
     
     "github.com/gorilla/websocket"
     
@@ -130,6 +131,11 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
         }
     }()
     
+    // initialize garbage collection
+    var refcount int64 = 0
+    var mux sync.Mutex
+    enter(&refcount, mux)
+    
     // enter service loop
     for {
         // receive
@@ -138,6 +144,7 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
             if err.Error()!="websocket: close 1000 (normal)" {
                 fmt.Println("Warn: Unable to receive through websocket:", err)
             }
+            leave(&refcount, mux, response_channel)
             return
         }
         
@@ -145,7 +152,27 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
         fmt.Println("Received: '", message, "'")
         
         // send off to processing
-        go Dispatch(message, response_channel)
+        enter(&refcount, mux)
+        go func() {
+            Dispatch(message, response_channel)
+            leave(&refcount, mux, response_channel)
+        }()
+    }
+}
+
+func enter (refcount *int64, mux sync.Mutex) {
+    mux.Lock()
+    *refcount++
+    mux.Unlock()
+}
+
+func leave (refcount *int64, mux sync.Mutex, response_channel chan []byte) {
+    mux.Lock()
+    *refcount--
+    mux.Unlock()
+    
+    if *refcount==0 {
+        close(response_channel)
     }
 }
 
