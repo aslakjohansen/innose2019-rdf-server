@@ -48,17 +48,17 @@ func Finalize () {
 ////////////////////////////////////////////////////////////////////// handlers
 
 func time_handler (rw http.ResponseWriter, request *http.Request) {
-    var result string = command.Time("")
+    var result string = command.Time("")+"\n"
     rw.Write([]byte(result))
 }
 
 func store_handler (rw http.ResponseWriter, request *http.Request) {
-    var result string = command.Store("", model_dir)
+    var result string = command.Store("", model_dir)+"\n"
     rw.Write([]byte(result))
 }
 
 func namespace_handler (rw http.ResponseWriter, request *http.Request) {
-    var result string = command.Namespaces("")
+    var result string = command.Namespaces("")+"\n"
     rw.Write([]byte(result))
 }
 
@@ -82,7 +82,7 @@ func query_handler (rw http.ResponseWriter, request *http.Request) {
         return
     }
     
-    var result string = command.Query("", query_str)
+    var result string = command.Query("", query_str)+"\n"
     rw.Write([]byte(result))
 }
 
@@ -106,7 +106,7 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
         return
     }
     
-    var result string = command.Update("", query_str)
+    var result string = command.Update("", query_str)+"\n"
     rw.Write([]byte(result))
 }
 

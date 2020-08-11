@@ -12,10 +12,10 @@ func Time (indent string) string {
     value, success = logic.Time()
     
     var response string = ""
-    response += fmt.Sprintf("%s{\n", indent)
+    response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("%s    \"success\": %t,\n", indent, success)
     response += fmt.Sprintf("%s    \"time\": %f\n", indent, value)
-    response += fmt.Sprintf("%s}\n", indent)
+    response += fmt.Sprintf("%s}", indent)
     
     return response
 }
@@ -26,10 +26,10 @@ func Store (indent string, model_dir *string) string {
     result, success = logic.Store(*model_dir)
     
     var response string = ""
-    response += fmt.Sprintf("%s{\n", indent)
+    response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("%s    \"success\": %t,\n", indent, success)
     response += fmt.Sprintf("%s    \"filename\": %s\n", indent, result)
-    response += fmt.Sprintf("%s}\n", indent)
+    response += fmt.Sprintf("%s}", indent)
     
     return response
 }
@@ -40,7 +40,7 @@ func Namespaces (indent string) string {
     result, success = logic.Namespaces()
     
     var response string = ""
-    response += fmt.Sprintf("%s{\n", indent)
+    response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("%s    \"success\": %t,\n", indent, success)
     response += fmt.Sprintf("%s    \"namespaces\": {\n", indent)
     var i    int = 0
@@ -54,7 +54,7 @@ func Namespaces (indent string) string {
         i++
     }
     response += fmt.Sprintf("%s    }\n", indent)
-    response += fmt.Sprintf("%s}\n", indent)
+    response += fmt.Sprintf("%s}", indent)
     
     return response
 }
@@ -67,14 +67,14 @@ func Query (indent string, query string) string {
     var response string = ""
     
     if success==false {
-        response += fmt.Sprintf("%s{\n", indent)
+        response += fmt.Sprintf("{\n")
         response += fmt.Sprintf("%s    \"success\": false,\n", indent)
         response += fmt.Sprintf("%s    \"error\": \"unable to evaluate query\"\n", indent)
-        response += fmt.Sprintf("%s}\n", indent)
+        response += fmt.Sprintf("%s}", indent)
         return response
     }
     
-    response += fmt.Sprintf("%s{\n", indent)
+    response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("%s    \"success\": %t,\n", indent, success)
     response += fmt.Sprintf("%s    \"resultset\": [\n", indent)
     for r:=0 ; r<len(result) ; r++ {
@@ -97,7 +97,7 @@ func Query (indent string, query string) string {
         }
     }
     response += fmt.Sprintf("%s    ]\n", indent)
-    response += fmt.Sprintf("%s}\n", indent)
+    response += fmt.Sprintf("%s}", indent)
     
     return response
 }
@@ -107,9 +107,9 @@ func Update (indent string, query string) string {
     _, success = logic.Update(query)
     
     var response string = ""
-    response += fmt.Sprintf("%s{\n", indent)
+    response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("%s    \"success\": %t\n", indent, success)
-    response += fmt.Sprintf("%s}\n", indent)
+    response += fmt.Sprintf("%s}", indent)
     
     return response
 }

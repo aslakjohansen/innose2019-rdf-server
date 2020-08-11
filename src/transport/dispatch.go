@@ -25,8 +25,7 @@ func (e *TimeEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\":\n")
-    response += fmt.Sprintf("%s", command.Time("        "))
+    response += fmt.Sprintf("    \"response\": %s\n", command.Time("    "))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
@@ -39,8 +38,7 @@ func (e *StoreEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\":\n")
-    response += fmt.Sprintf("%s", command.Store("        ", model_dir))
+    response += fmt.Sprintf("    \"response\": %s\n", command.Store("    ", model_dir))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
@@ -53,8 +51,7 @@ func (e *NamespacesEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\":\n")
-    response += fmt.Sprintf("%s", command.Namespaces("        "))
+    response += fmt.Sprintf("    \"response\": %s\n", command.Namespaces("    "))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
@@ -68,8 +65,7 @@ func (e *QueryEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\":\n")
-    response += fmt.Sprintf("%s", command.Query("        ", e.Query))
+    response += fmt.Sprintf("    \"response\": %s\n", command.Query("    ", e.Query))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
@@ -83,8 +79,7 @@ func (e *UpdateEntry) Handle (response_channel chan []byte) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    response += fmt.Sprintf("    \"response\":\n")
-    response += fmt.Sprintf("%s", command.Update("        ", e.Query))
+    response += fmt.Sprintf("    \"response\": %s\n", command.Update("    ", e.Query))
     response += fmt.Sprintf("}\n")
     
     response_channel <- []byte(response)
