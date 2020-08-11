@@ -11,6 +11,7 @@ import (
 )
 
 var (
+    promt_string       string = ">> "
     history_filename   string
     buffer           []string = make([]string, 0)
     buffer_mutex       sync.Mutex
@@ -67,7 +68,7 @@ func command_reader (command_channel chan string, interrupt_channel chan os.Sign
     
     // main loop
     for {
-        line, err := line_handler.Prompt(">> ")
+        line, err := line_handler.Prompt(promt_string)
         if err!=nil {
             if err!=liner.ErrPromptAborted {
                 fmt.Println("Error: Unable to read input:", err)
@@ -136,12 +137,14 @@ func main () {
         select {
             case command := <-command_channel:
                 if command=="\n" || command=="" {
+                    fmt.Println("")
                     for {
                         entry := buffer_remove()
                         if entry==nil {
                             break
+                        } else {
+                            fmt.Println(*entry)
                         }
-                        fmt.Println(*entry)
                     }
                 } else {
                     err := con.WriteMessage(websocket.TextMessage, []byte(command))
