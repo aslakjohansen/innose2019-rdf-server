@@ -18,6 +18,8 @@ deps:
 	go get github.com/sbinet/go-python
 	go get github.com/gorilla/websocket
 	go get github.com/peterh/liner
+	go get -u golang.org/x/tools/cmd/goyacc
+	go get github.com/timtadh/lexmachine
 
 
 ../var/model:
