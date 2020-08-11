@@ -75,6 +75,21 @@ func (e *QueryEntry) Handle (response_channel chan []byte) {
     response_channel <- []byte(response)
 }
 
+type UpdateEntry struct {
+    Entry
+    Query string `json:"query"`
+}
+func (e *UpdateEntry) Handle (response_channel chan []byte) {
+    var response string = ""
+    response += fmt.Sprintf("{\n")
+    response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
+    response += fmt.Sprintf("    \"response\":\n")
+    response += fmt.Sprintf("%s", command.Update("        ", e.Query))
+    response += fmt.Sprintf("}\n")
+    
+    response_channel <- []byte(response)
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////// main dispatcher
 
@@ -115,6 +130,14 @@ func Dispatch (input []byte, response_channel chan []byte) {
         typed_entry.Handle(response_channel)
     case "query":
         var typed_entry QueryEntry
+        err := json.Unmarshal(input, &typed_entry)
+        if err!=nil {
+            fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
+            return
+        }
+        typed_entry.Handle(response_channel)
+    case "update":
+        var typed_entry UpdateEntry
         err := json.Unmarshal(input, &typed_entry)
         if err!=nil {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))

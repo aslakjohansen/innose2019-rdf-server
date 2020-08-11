@@ -101,3 +101,15 @@ func Query (indent string, query string) string {
     
     return response
 }
+
+func Update (indent string, query string) string {
+    var success bool
+    _, success = logic.Update(query)
+    
+    var response string = ""
+    response += fmt.Sprintf("%s{\n", indent)
+    response += fmt.Sprintf("%s    \"success\": %t\n", indent, success)
+    response += fmt.Sprintf("%s}\n", indent)
+    
+    return response
+}
