@@ -8,7 +8,6 @@ import (
     
     "github.com/gorilla/websocket"
     
-    "innose2019-rdf-server/logic"
     "innose2019-rdf-server/command"
 )
 
@@ -106,12 +105,8 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
         return
     }
     
-    var success bool
-    _, success = logic.Update(query_str)
-    
-    rw.Write([]byte("{\n"))
-    rw.Write([]byte(fmt.Sprintf("    \"success\": %t\n", success)))
-    rw.Write([]byte("}\n"))
+    var result string = command.Update("", query_str)
+    rw.Write([]byte(result))
 }
 
 func websocket_handler (rw http.ResponseWriter, request *http.Request) {
