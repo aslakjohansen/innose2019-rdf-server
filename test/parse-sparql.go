@@ -14,7 +14,7 @@ func main () {
     
     line, err := sparql.Parse(lexer, input)
     if err != nil {
-        fmt.Fprintln(os.Stderr, err)
+        fmt.Println("Error parsing:", err)
         os.Exit(1)
     }
     
