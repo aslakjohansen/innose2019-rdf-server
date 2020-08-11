@@ -148,9 +148,6 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
             return
         }
         
-        // print to screen
-        fmt.Println("Received: '", message, "'")
-        
         // send off to processing
         enter(&refcount, mux)
         go func() {

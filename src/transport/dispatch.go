@@ -89,8 +89,6 @@ func (e *UpdateEntry) Handle (response_channel chan []byte) {
 /////////////////////////////////////////////////////////////// main dispatcher
 
 func Dispatch (input []byte, response_channel chan []byte) {
-    fmt.Println(string(input))
-    
     var entry Entry
     err := json.Unmarshal(input, &entry)
     if err!=nil {
