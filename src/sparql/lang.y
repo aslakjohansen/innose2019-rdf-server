@@ -14,11 +14,14 @@ import (
 }
 
 %token VAR
+%token URI
 %token SELECT
 %token WHERE
 %token UNION
 %token LBRACE
 %token RBRACE
+%token LT
+%token GT
 %token PERIOD
 %token SLASH
 %token VBAR
@@ -99,6 +102,9 @@ Restriction
 Entity
     : Var {
         $$.ast = NewNode("var", $1.token)
+      }
+    | LT URI GT {
+        $$.ast = NewNode("uri", $2.token)
       }
     ;
 
