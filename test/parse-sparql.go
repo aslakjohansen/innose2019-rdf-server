@@ -10,13 +10,17 @@ import (
 func main () {
     var lexer = sparql.NewLexer(true)
     
-    var input string = "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }"
-    
-    line, err := sparql.Parse(lexer, input)
-    if err != nil {
-        fmt.Println("Error parsing:", err)
-        os.Exit(1)
+    var inputs []string = []string{
+      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
     }
     
-    fmt.Println(line)
+    for _, input := range inputs {
+        line, err := sparql.Parse(lexer, input)
+        if err != nil {
+            fmt.Println("Error parsing:", err)
+            os.Exit(1)
+        }
+        
+        fmt.Println(line)
+    }
 }
