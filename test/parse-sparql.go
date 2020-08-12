@@ -20,6 +20,7 @@ func main () {
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2++ ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2* ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 (?var2|?var3)/?var4 ?var5 . }",
+      "SELECT ?var1 ?var2 WHERE { { ?var1 ?var1 ?var2 } UNION { ?var1 ?var2 ?var2 } . }",
     }
     
     for _, input := range inputs {

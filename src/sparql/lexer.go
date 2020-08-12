@@ -52,6 +52,7 @@ func NewLexer (dfa bool) *lexmachine.Lexer {
     lexer.Add([]byte(`\?[a-zA-Z][a-zA-Z0-9]*`), token(VAR))
     lexer.Add([]byte(`(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)`), token(SELECT))
     lexer.Add([]byte(`(W|w)(H|w)(E|e)(R|r)(E|e)`), token(WHERE))
+    lexer.Add([]byte(`(U|u)(N|n)(I|i)(O|o)(N|n)`), token(UNION))
     lexer.Add([]byte(`\{`), token(LBRACE))
     lexer.Add([]byte(`\}`), token(RBRACE))
     lexer.Add([]byte(`\(`), token(LPAR))

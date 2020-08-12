@@ -16,6 +16,7 @@ import (
 %token	VAR
 %token	SELECT
 %token	WHERE
+%token	UNION
 %token	LBRACE
 %token	RBRACE
 %token	PERIOD
@@ -85,6 +86,12 @@ Restriction
         node.AddChild($1.ast)
         node.AddChild($2.ast)
         node.AddChild($3.ast)
+        $$.ast = node
+      }
+    | LBRACE Restriction RBRACE UNION LBRACE Restriction RBRACE {
+        node := NewNode("union", $4.token)
+        node.AddChild($2.ast)
+        node.AddChild($6.ast)
         $$.ast = node
       }
     ;
