@@ -13,19 +13,19 @@ import (
     ast   *Node
 }
 
-%token	VAR
-%token	SELECT
-%token	WHERE
-%token	UNION
-%token	LBRACE
-%token	RBRACE
-%token	PERIOD
-%token	SLASH
-%token	VBAR
-%token	PLUS
-%token	ASTERISK
-%token	LPAR
-%token	RPAR
+%token VAR
+%token SELECT
+%token WHERE
+%token UNION
+%token LBRACE
+%token RBRACE
+%token PERIOD
+%token SLASH
+%token VBAR
+%token PLUS
+%token ASTERISK
+%token LPAR
+%token RPAR
 
 %left LPAR SLASH VBAR
 
