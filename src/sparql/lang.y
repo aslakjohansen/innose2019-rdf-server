@@ -44,7 +44,7 @@ VarList
       }
     | Var {
         node := NewNode("list", $1.token)
-        node.AddChild(NewNode("var", $1.token))
+        node.AddChild($1.ast)
         $$.ast = node
       }
     ;
@@ -89,7 +89,7 @@ Entity
 
 Path
     : Var {
-        $$.ast = NewNode("var", $1.token)
+        $$.ast = $1.ast
       }
     ;
 
