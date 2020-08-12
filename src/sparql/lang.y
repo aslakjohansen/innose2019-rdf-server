@@ -20,6 +20,7 @@ import (
 %token	RBRACE
 %token	PERIOD
 %token	SLASH
+%token	VBAR
 
 %% /* The grammar follows.  */
 
@@ -91,6 +92,12 @@ Entity
 Path
     : Path SLASH Path {
         node := NewNode("sequence", $2.token)
+        node.AddChild($1.ast)
+        node.AddChild($3.ast)
+        $$.ast = node
+      }
+    |  Path VBAR Path {
+        node := NewNode("choice", $2.token)
         node.AddChild($1.ast)
         node.AddChild($3.ast)
         $$.ast = node
