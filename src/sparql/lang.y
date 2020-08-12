@@ -67,7 +67,6 @@ RestrictionList
     | Restriction PERIOD {
         node := NewNode("list", $1.token)
         node.AddChild($1.ast)
-//        node.AddChild(NewNode("restriction", $1.token))
         $$.ast = node
       }
     ;
