@@ -2,6 +2,9 @@ package logic
 
 import (
     "fmt"
+    "encoding/json"
+    
+    "innose2019-rdf-server/sparql"
 )
 
 func JsonTime (indent string) string {
@@ -107,6 +110,25 @@ func JsonUpdate (indent string, query string) string {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("%s    \"success\": %t\n", indent, success)
+    response += fmt.Sprintf("%s}", indent)
+    
+    return response
+}
+
+func JsonInspect (indent string, query string) string {
+    var lexer = sparql.NewLexer(true)
+    data, err := sparql.Parse(lexer, query)
+    
+    var response string = ""
+    response += fmt.Sprintf("{\n")
+    response += fmt.Sprintf("%s    \"success\": %t,\n", indent, err==nil)
+    if err==nil {
+        s, _ := json.Marshal(data.String())
+        response += fmt.Sprintf("%s    \"sexp\": %s\n", indent, s)
+    } else {
+        s, _ := json.Marshal(fmt.Sprint(err))
+        response += fmt.Sprintf("%s    \"error\": %s\n", indent, s)
+    }
     response += fmt.Sprintf("%s}", indent)
     
     return response

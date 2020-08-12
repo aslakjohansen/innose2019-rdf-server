@@ -872,3 +872,20 @@ $ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n
 - a where clause must exist
 - no slashes in entity names
 
+
+### Inspecting a query
+
+```shell
+$ curl -X PUT -d '"ELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhost:8001/inspect
+{
+    "success": false,
+    "error": "Lexer error: could not match text starting at 1:1 failing at 1:2.\n\tunmatched text: \"E\""
+}
+$ curl -X PUT -d '"SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhost:8001/inspect
+{
+    "success": true,
+    "sexp": "(select \"SELECT\" (list \"?pred\" (var \"?pred\") (var \"?obj\")) (list \"?sub\" (restriction \"?sub\" (var \"?sub\") (var \"?pred\") (var \"?obj\"))))"
+}
+```
+
+**Note:** This may provide useful insights while debugging.
