@@ -19,6 +19,7 @@ import (
 %token	LBRACE
 %token	RBRACE
 %token	PERIOD
+%token	SLASH
 
 %% /* The grammar follows.  */
 
@@ -88,7 +89,13 @@ Entity
     ;
 
 Path
-    : Var {
+    : Path SLASH Path {
+        node := NewNode("sequence", $2.token)
+        node.AddChild($1.ast)
+        node.AddChild($3.ast)
+        $$.ast = node
+      }
+    | Var {
         $$.ast = $1.ast
       }
     ;

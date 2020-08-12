@@ -12,6 +12,7 @@ func main () {
     
     var inputs []string = []string{
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
+      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2/?var2 ?var3 . }",
     }
     
     for _, input := range inputs {
