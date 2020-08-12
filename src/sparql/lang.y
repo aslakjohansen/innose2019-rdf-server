@@ -23,16 +23,23 @@ import (
 
 SelectStatement
     : SELECT VarList WHERE LBRACE RBRACE {
-        yylex.(*golex).line = NewNode("select", $1.token).AddChild($2.ast)
+        varlist := $2.ast
+        varlist.CollapseChildList()
+        node := NewNode("select", $1.token)
+        node.AddChild(varlist)
+        yylex.(*golex).line = node
       }
     ;
 
 VarList
     : Var VarList {
-        $$.ast = NewNode("varlist", $1.token).AddChild($1.ast).AddChild($2.ast)
+        $$.ast = NewNode("list", $1.token)
+        $$.ast.AddChild($1.ast)
+        $$.ast.AddChild($2.ast)
       }
     | Var {
-        $$.ast = NewNode("var", $1.token)
+        $$.ast = NewNode("list", $1.token)
+        $$.ast.AddChild(NewNode("var", $1.token))
       }
     ;
 

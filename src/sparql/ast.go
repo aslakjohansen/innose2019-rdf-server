@@ -31,6 +31,47 @@ func (n *Node) PrependChild (child *Node) *Node {
     return n
 }
 
+func (n *Node) CollapseChildList () *Node {
+    var current *Node
+    
+    // find length
+    var length int  = 0
+    current = n
+    for current!=nil {
+        length++
+        if len(current.Children)>1 {
+            current = current.Children[1]
+        } else {
+            current = nil
+        }
+    }
+    
+    // allocate
+    var result []*Node = make([]*Node, length)
+    
+    // copy
+    var i int = 0
+    current = n
+    for current!=nil {
+        if current.Name=="list" {
+            result[i] = current.Children[0]
+        } else {
+            result[i] = current
+        }
+        i++
+        if len(current.Children)>1 {
+            current = current.Children[1]
+        } else {
+            current = nil
+        }
+    }
+    
+    // store
+    n.Children = result
+    
+    return n
+}
+
 func (n *Node) String () string {
     parts := make([]string, 0, len(n.Children))
     parts = append(parts, n.Name)
