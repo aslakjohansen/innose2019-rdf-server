@@ -33,13 +33,15 @@ SelectStatement
 
 VarList
     : Var VarList {
-        $$.ast = NewNode("list", $1.token)
-        $$.ast.AddChild($1.ast)
-        $$.ast.AddChild($2.ast)
+        node := NewNode("list", $1.token)
+        node.AddChild($1.ast)
+        node.AddChild($2.ast)
+        $$.ast = node
       }
     | Var {
-        $$.ast = NewNode("list", $1.token)
-        $$.ast.AddChild(NewNode("var", $1.token))
+        node := NewNode("list", $1.token)
+        node.AddChild(NewNode("var", $1.token))
+        $$.ast = node
       }
     ;
 
