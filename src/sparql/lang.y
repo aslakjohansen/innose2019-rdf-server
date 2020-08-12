@@ -21,6 +21,8 @@ import (
 %token	PERIOD
 %token	SLASH
 %token	VBAR
+%token	PLUS
+%token	ASTERISK
 
 %% /* The grammar follows.  */
 
@@ -100,6 +102,16 @@ Path
         node := NewNode("choice", $2.token)
         node.AddChild($1.ast)
         node.AddChild($3.ast)
+        $$.ast = node
+      }
+    |  Path PLUS {
+        node := NewNode("one-or-more", $2.token)
+        node.AddChild($1.ast)
+        $$.ast = node
+      }
+    |  Path ASTERISK {
+        node := NewNode("zero-or-more", $2.token)
+        node.AddChild($1.ast)
         $$.ast = node
       }
     | Var {

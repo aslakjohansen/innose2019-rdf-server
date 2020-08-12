@@ -57,6 +57,8 @@ func NewLexer (dfa bool) *lexmachine.Lexer {
     lexer.Add([]byte(`\.`), token(PERIOD))
     lexer.Add([]byte(`\/`), token(SLASH))
     lexer.Add([]byte(`\|`), token(VBAR))
+    lexer.Add([]byte(`\+`), token(PLUS))
+    lexer.Add([]byte(`\*`), token(ASTERISK))
     lexer.Add([]byte("( |\t|\n|\r)+"), skip)
     
     var err error
