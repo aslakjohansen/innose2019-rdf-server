@@ -137,12 +137,16 @@ func main () {
         select {
             case command := <-command_channel:
                 if command=="\n" || command=="" {
-                    fmt.Println("")
+                    var first bool = true
                     for {
                         entry := buffer_remove()
                         if entry==nil {
                             break
                         } else {
+                            if first {
+                                fmt.Println("")
+                                first = false
+                            }
                             fmt.Println(*entry)
                         }
                     }
