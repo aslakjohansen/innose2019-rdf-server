@@ -20,14 +20,14 @@ func NewNode (name string, token *lexmachine.Token) *Node {
     }
 }
 
-func (n *Node) AddKid (kid *Node) *Node {
-    n.Children = append(n.Children, kid)
+func (n *Node) AddChild (child *Node) *Node {
+    n.Children = append(n.Children, child)
     return n
 }
 
-func (n *Node) PrependKid (kid *Node) *Node {
-    kids := append(make([]*Node, 0, cap(n.Children)+1), kid)
-    n.Children = append(kids, n.Children...)
+func (n *Node) PrependChild (child *Node) *Node {
+    children := append(make([]*Node, 0, cap(n.Children)+1), child)
+    n.Children = append(children, n.Children...)
     return n
 }
 
