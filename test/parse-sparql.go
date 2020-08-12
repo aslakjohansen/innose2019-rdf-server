@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-    "os"
     
     "innose2019-rdf-server/sparql"
 )
@@ -12,19 +11,22 @@ func main () {
     
     var inputs []string = []string{
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
+      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 (?var2) ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2/?var2 ?var3 . }",
-      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2|?var2 ?var3 . }",
+      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2|?var3 ?var4 . }",
+      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 (?var2|?var3) ?var4 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2+ ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2* ?var3 . }",
+      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 (?var2|?var3)/?var4 ?var5 . }",
     }
     
     for _, input := range inputs {
+        fmt.Println(input)
         line, err := sparql.Parse(lexer, input)
         if err != nil {
-            fmt.Println("Error parsing:", err)
-            os.Exit(1)
+            fmt.Println(">> Error parsing:", err)
+        } else {
+            fmt.Println(">>", line)
         }
-        
-        fmt.Println(line)
     }
 }

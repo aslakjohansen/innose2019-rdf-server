@@ -23,6 +23,10 @@ import (
 %token	VBAR
 %token	PLUS
 %token	ASTERISK
+%token	LPAR
+%token	RPAR
+
+%left LPAR SLASH VBAR
 
 %% /* The grammar follows.  */
 
@@ -98,23 +102,32 @@ Path
         node.AddChild($3.ast)
         $$.ast = node
       }
-    |  Path VBAR Path {
+    | Path VBAR Path {
         node := NewNode("choice", $2.token)
         node.AddChild($1.ast)
         node.AddChild($3.ast)
         $$.ast = node
       }
-    |  Path PLUS {
+    | Step PLUS {
         node := NewNode("one-or-more", $2.token)
         node.AddChild($1.ast)
         $$.ast = node
       }
-    |  Path ASTERISK {
+    | Step ASTERISK {
         node := NewNode("zero-or-more", $2.token)
         node.AddChild($1.ast)
         $$.ast = node
       }
-    | Var {
+    | LPAR Path RPAR {
+        $$.ast = $2.ast
+      }
+    | Step {
+        $$.ast = $1.ast
+      }
+    ;
+
+Step
+    : Var {
         $$.ast = $1.ast
       }
     ;
