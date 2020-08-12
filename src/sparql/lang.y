@@ -18,15 +18,19 @@ import (
 %token	WHERE
 %token	LBRACE
 %token	RBRACE
+%token	PERIOD
 
 %% /* The grammar follows.  */
 
 SelectStatement
-    : SELECT VarList WHERE LBRACE RBRACE {
+    : SELECT VarList WHERE LBRACE RestrictionList RBRACE {
         varlist := $2.ast
         varlist.CollapseChildList()
+        reslist := $5.ast
+        reslist.CollapseChildList()
         node := NewNode("select", $1.token)
         node.AddChild(varlist)
+        node.AddChild(reslist)
         yylex.(*golex).line = node
       }
     ;
@@ -52,5 +56,42 @@ Var
     ;
 
 ;
+
+RestrictionList
+    : Restriction PERIOD RestrictionList {
+        node := NewNode("list", $1.token)
+        node.AddChild($1.ast)
+        node.AddChild($2.ast)
+        $$.ast = node
+      }
+    | Restriction PERIOD {
+        node := NewNode("list", $1.token)
+        node.AddChild($1.ast)
+//        node.AddChild(NewNode("restriction", $1.token))
+        $$.ast = node
+      }
+    ;
+
+Restriction
+    : Entity Path Entity {
+        node := NewNode("restriction", $1.token)
+        node.AddChild($1.ast)
+        node.AddChild($2.ast)
+        node.AddChild($3.ast)
+        $$.ast = node
+      }
+    ;
+
+Entity
+    : Var {
+        $$.ast = NewNode("var", $1.token)
+      }
+    ;
+
+Path
+    : Var {
+        $$.ast = NewNode("var", $1.token)
+      }
+    ;
 
 %%
