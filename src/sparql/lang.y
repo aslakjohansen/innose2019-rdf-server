@@ -15,6 +15,7 @@ import (
 
 %token VAR
 %token URI
+%token STRING
 %token SELECT
 %token WHERE
 %token UNION
@@ -103,8 +104,18 @@ Entity
     : Var {
         $$.ast = NewNode("var", $1.token)
       }
+    | Literal {
+        $$.ast = $1.ast
+      }
     | LT URI GT {
         $$.ast = NewNode("uri", $2.token)
+      }
+    ;
+
+Literal
+    : STRING {
+        node := NewNode("string", $1.token)
+        $$.ast = node
       }
     ;
 

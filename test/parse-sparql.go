@@ -23,6 +23,9 @@ func main () {
       "SELECT ?var1 ?var2 WHERE { { ?var1 ?var1 ?var2 } UNION { ?var1 ?var2 ?var2 } . }",
       "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 < http://www.google.com#test > . }",
       "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 <http://www.google.com#test> . }",
+      "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 \"\" . }",
+      "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 \"a b\" . }",
+      "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 \"a \\\" b\" . }",
     }
     
     for _, input := range inputs {
