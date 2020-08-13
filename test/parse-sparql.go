@@ -12,6 +12,8 @@ func main () {
     var inputs []string = []string{
       "garbage",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
+      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 #\n?var2 ?var3 . }",
+      "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 #comment\n?var2 ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 (?var2) ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2/?var2 ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2|?var3 ?var4 . }",
