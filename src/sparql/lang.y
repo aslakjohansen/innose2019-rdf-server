@@ -15,7 +15,9 @@ import (
 
 %token VAR
 %token URI
+%token NSID
 %token STRING
+%token PREFIX
 %token SELECT
 %token WHERE
 %token UNION
@@ -28,6 +30,7 @@ import (
 %token VBAR
 %token PLUS
 %token ASTERISK
+%token COLON
 %token LPAR
 %token RPAR
 
@@ -36,15 +39,53 @@ import (
 %% /* The grammar follows.  */
 
 SelectStatement
-    : SELECT VarList WHERE LBRACE RestrictionList RBRACE {
+    : PrefixList SELECT VarList WHERE LBRACE RestrictionList RBRACE {
+        prefixlist := $1.ast
+        prefixlist.CollapseChildList()
+        varlist := $3.ast
+        varlist.CollapseChildList()
+        reslist := $6.ast
+        reslist.CollapseChildList()
+        node := NewNode("select", $1.token)
+        node.AddChild(prefixlist)
+        node.AddChild(varlist)
+        node.AddChild(reslist)
+        yylex.(*golex).line = node
+      }
+    | SELECT VarList WHERE LBRACE RestrictionList RBRACE {
         varlist := $2.ast
         varlist.CollapseChildList()
         reslist := $5.ast
         reslist.CollapseChildList()
         node := NewNode("select", $1.token)
+        node.AddChild(NewNode("list", $1.token)) // missing prefix
         node.AddChild(varlist)
         node.AddChild(reslist)
         yylex.(*golex).line = node
+      }
+    ;
+
+PrefixList
+    : Prefix PrefixList {
+        node := NewNode("list", $1.token)
+        node.AddChild($1.ast)
+        node.AddChild($2.ast)
+        $$.ast = node
+        
+      }
+    | Prefix {
+        node := NewNode("list", $1.token)
+        node.AddChild($1.ast)
+        $$.ast = node
+      }
+    ;
+
+Prefix
+    : PREFIX NsId COLON LT Uri GT {
+        node := NewNode("prefix", $1.token)
+        node.AddChild($2.ast)
+        node.AddChild($5.ast)
+        $$.ast = node
       }
     ;
 
@@ -108,7 +149,19 @@ Entity
         $$.ast = $1.ast
       }
     | LT URI GT {
-        $$.ast = NewNode("uri", $2.token)
+        $$.ast = $2.ast
+      }
+    ;
+
+Uri
+    : URI {
+        $$.ast = NewNode("uri", $1.token)
+      }
+    ;
+
+NsId
+    : NSID {
+        $$.ast = NewNode("nsid", $1.token)
       }
     ;
 
