@@ -15,7 +15,8 @@ import (
 
 %token VAR
 %token URI
-%token NSID
+%token ID
+%token LOCALID
 %token STRING
 %token PREFIX
 %token SELECT
@@ -81,7 +82,7 @@ PrefixList
     ;
 
 Prefix
-    : PREFIX NsId COLON LT Uri GT {
+    : PREFIX Id COLON LT Uri GT {
         node := NewNode("prefix", $1.token)
         node.AddChild($2.ast)
         node.AddChild($5.ast)
@@ -151,6 +152,9 @@ Entity
     | LT URI GT {
         $$.ast = $2.ast
       }
+    | PrefixedEntity {
+        $$.ast = $1.ast
+      }
     ;
 
 Uri
@@ -159,9 +163,24 @@ Uri
       }
     ;
 
-NsId
-    : NSID {
-        $$.ast = NewNode("nsid", $1.token)
+Id
+    : ID {
+        $$.ast = NewNode("id", $1.token)
+      }
+    ;
+
+LocalId
+    : LOCALID {
+        $$.ast = NewNode("id", $1.token)
+      }
+    ;
+
+PrefixedEntity
+    : Id COLON Id {
+        node := NewNode("prefixed", $2.token)
+        node.AddChild($1.ast)
+        node.AddChild($3.ast)
+        $$.ast = node
       }
     ;
 

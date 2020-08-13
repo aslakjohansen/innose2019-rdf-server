@@ -31,6 +31,7 @@ func main () {
       "PREFIX a : <http://b> SELECT ?var1 ?var2 WHERE { ?var1 ?var2 ?var3 . }",
       "PREFIX a:<http://b> SELECT ?var1 ?var2 WHERE { ?var1 ?var2 ?var3 . }",
       "PREFIX a:<http://b> PREFIX c:<http://d> SELECT ?var1 ?var2 WHERE { ?var1 ?var2 ?var3 . }",
+      "SELECT ?var1 ?var2 ?var3 WHERE { a:b ?var2 ?var3 . }",
     }
     
     for _, input := range inputs {

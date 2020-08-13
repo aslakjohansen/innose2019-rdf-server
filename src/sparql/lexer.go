@@ -60,7 +60,7 @@ func NewLexer (dfa bool) *lexmachine.Lexer {
     lexer.Add([]byte(`(U|u)(N|n)(I|i)(O|o)(N|n)`), token(UNION))
     lexer.Add([]byte(`(P|p)(R|r)(E|e)(F|f)(I|i)(X|x)`), token(PREFIX))
     lexer.Add([]byte(`[a-zA-Z]+\:\/\/[^ \t\n\r\<\>]+`), token(URI))
-    lexer.Add([]byte(`[a-zA-Z][a-zA-Z0-9]*`), token(NSID))
+    lexer.Add([]byte(`[a-zA-Z][a-zA-Z0-9]*`), token(ID))
     lexer.Add([]byte(`\"([^\"\\]|\\.)*\"`), token(STRING))
     lexer.Add([]byte(`\{`), token(LBRACE))
     lexer.Add([]byte(`\}`), token(RBRACE))
