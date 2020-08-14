@@ -41,7 +41,7 @@ func main () {
         tokens := sparql.Tokens(lexer, []byte(input))
         fmt.Println("[TOKENS]")
         for _, token := range tokens {
-            fmt.Println(" - ", token)
+            fmt.Println(" -", token)
         }
         fmt.Println("")
         
