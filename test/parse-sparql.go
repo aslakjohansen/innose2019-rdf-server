@@ -36,11 +36,22 @@ func main () {
     
     for _, input := range inputs {
         fmt.Println("Case:", input)
+        
+        
+        tokens := sparql.Tokens(lexer, []byte(input))
+        fmt.Println("[TOKENS]")
+        for _, token := range tokens {
+            fmt.Println(" - ", token)
+        }
+        fmt.Println("")
+        
         line, err := sparql.Parse(lexer, input)
         if err != nil {
-            fmt.Println(">> Error parsing:", err)
+            fmt.Println("[PARSE] Error parsing:", err)
         } else {
-            fmt.Println(">>", line)
+            fmt.Println("[PARSE]", line)
         }
+        
+        fmt.Println("")
     }
 }

@@ -20,6 +20,36 @@ func newGoLex (lexer *lexmachine.Lexer, text []byte) (*golex, error) {
     return &golex{Scanner: scan}, nil
 }
 
+func Tokens (lexer *lexmachine.Lexer, text []byte) []string {
+    var result []string = make([]string, 0)
+    
+    scanner, err := lexer.Scanner(text)
+    if err != nil {
+        result = append(result, fmt.Sprint(err))
+        return result
+    }
+    
+    for tok, err, eos := scanner.Next(); !eos; tok, err, eos = scanner.Next() {
+        if ui, is := err.(*machines.UnconsumedInput); is {
+            // skip the error via:
+            // scanner.TC = ui.FailTC
+            //
+            result = append(result, fmt.Sprint(err))
+            result = append(result, fmt.Sprint(ui))
+            result = append(result, fmt.Sprint(is))
+            return result
+        } else if err != nil {
+            result = append(result, fmt.Sprint(err))
+            return result
+        }
+//        var t *lexmachine.Token = tok.(*lexmachine.Token)
+        result = append(result, fmt.Sprint(tok))
+//        result = append(result, fmt.Sprintf("TOKEN %d", t.Type))
+    }
+    
+    return result
+}
+
 func (g *golex) Lex (lval *yySymType) (tokenType int) {
     s := g.Scanner
     tok, err, eof := s.Next()
