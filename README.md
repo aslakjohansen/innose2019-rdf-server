@@ -872,7 +872,6 @@ $ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n
 - a where clause must exist
 - no slashes in entity names
 
-
 ### Inspecting a query
 
 ```shell
