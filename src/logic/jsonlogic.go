@@ -116,19 +116,50 @@ func JsonUpdate (indent string, query string) string {
 }
 
 func JsonInspect (indent string, query string) string {
-    var lexer = sparql.NewLexer(true)
-    data, err := sparql.Parse(lexer, query)
-    
     var response string = ""
-    response += fmt.Sprintf("{\n")
-    response += fmt.Sprintf("%s    \"success\": %t,\n", indent, err==nil)
-    if err==nil {
-        s, _ := json.Marshal(data.String())
-        response += fmt.Sprintf("%s    \"sexp\": %s\n", indent, s)
-    } else {
+    
+    // tokenize
+    tokens, err := sparql.Tokens(sparql.NewLexer(true), []byte(query))
+    if err!=nil {
         s, _ := json.Marshal(fmt.Sprint(err))
-        response += fmt.Sprintf("%s    \"error\": %s\n", indent, s)
+        response += fmt.Sprintf("{\n")
+        response += fmt.Sprintf("%s    \"success\": false,\n", indent)
+        response += fmt.Sprintf("%s    \"error\": {\n", indent)
+        response += fmt.Sprintf("%s        \"type\": \"lex\",\n", indent)
+        response += fmt.Sprintf("%s        \"data\": %s\n", indent, s)
+        response += fmt.Sprintf("%s    }\n", indent)
+        response += fmt.Sprintf("%s}", indent)
+        return response
     }
+    
+    // parse
+    parse_data, err := sparql.Parse(sparql.NewLexer(true), query)
+    if err!=nil {
+        s, _ := json.Marshal(fmt.Sprint(err))
+        response += fmt.Sprintf("{\n")
+        response += fmt.Sprintf("%s    \"success\": false,\n", indent)
+        response += fmt.Sprintf("%s    \"error\": {\n", indent)
+        response += fmt.Sprintf("%s        \"type\": \"parse\",\n", indent)
+        response += fmt.Sprintf("%s        \"data\": %s\n", indent, s)
+        response += fmt.Sprintf("%s    }\n", indent)
+        response += fmt.Sprintf("%s}", indent)
+        return response
+    }
+    
+    // format result
+    s, _ := json.Marshal(parse_data.String())
+    response += fmt.Sprintf("{\n")
+    response += fmt.Sprintf("%s    \"success\": true,\n", indent)
+    response += fmt.Sprintf("%s    \"tokens\": [\n", indent)
+    for i, token := range tokens {
+        response += fmt.Sprintf("%s        \"%s\"", indent, token)
+        if i!=len(tokens)-1 {
+            response += fmt.Sprintf(",")
+        }
+        response += fmt.Sprintf("\n")
+    }
+    response += fmt.Sprintf("%s    ],\n", indent)
+    response += fmt.Sprintf("%s    \"sexp\": %s\n", indent, s)
     response += fmt.Sprintf("%s}", indent)
     
     return response

@@ -37,8 +37,7 @@ func main () {
     for _, input := range inputs {
         fmt.Println("Case:", input)
         
-        
-        tokens := sparql.Tokens(lexer, []byte(input))
+        tokens, _ := sparql.Tokens(lexer, []byte(input))
         fmt.Println("[TOKENS]")
         for _, token := range tokens {
             fmt.Println(" -", token)
