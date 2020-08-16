@@ -89,20 +89,6 @@ Query
     ;
 
 SelectStatement
-//    : PrefixList SELECT VarList WHERE LBRACE RestrictionList RBRACE {
-//        prefixlist := $1.ast
-//        prefixlist.CollapseChildList()
-//        varlist := $3.ast
-//        varlist.CollapseChildList()
-//        reslist := $6.ast
-//        reslist.CollapseChildList()
-//        node := NewNode("select", $1.token)
-//        node.AddChild(prefixlist)
-//        node.AddChild(varlist)
-//        node.AddChild(reslist)
-//        yylex.(*golex).line = node
-//      }
-//    |
     : SELECT VarList WHERE LBRACE RestrictionList RBRACE {
         varlist := $2.ast
         varlist.CollapseChildList()
@@ -112,7 +98,6 @@ SelectStatement
         node.AddChild(NewNode("list", $1.token)) // missing prefix
         node.AddChild(varlist)
         node.AddChild(reslist)
-//        yylex.(*golex).line = node
         $$.ast = node
       }
     ;
