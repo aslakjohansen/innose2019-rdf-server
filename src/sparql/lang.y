@@ -12,18 +12,18 @@ import (
     token *lexmachine.Token
     ast   *Node
 }
-
-%token VAR
-%token URI
-%token ID
-%token LOCALID
-%token STRING
-%token PREFIX
 %token SELECT
 %token WHERE
 %token UNION
 %token DATA
 %token UNITS
+%token PREFIX
+
+%token VAR
+%token URI
+%token ID
+%token STRING
+
 %token LBRACE
 %token RBRACE
 %token LT
@@ -201,12 +201,6 @@ Uri
 
 Id
     : ID {
-        $$.ast = NewNode("id", $1.token)
-      }
-    ;
-
-LocalId
-    : LOCALID {
         $$.ast = NewNode("id", $1.token)
       }
     ;
