@@ -91,6 +91,7 @@ func NewLexer (dfa bool) *lexmachine.Lexer {
     lexer.Add([]byte(`[a-zA-Z]+\:\/\/[^ \t\n\r\<\>]+`), token(URI))
     lexer.Add([]byte(`[a-zA-Z][a-zA-Z0-9]*`), token(ID))
     lexer.Add([]byte(`\"([^\"\\]|\\.)*\"`), token(STRING))
+    lexer.Add([]byte(`\-\>`), token(ARROW))
     
     lexer.Add([]byte(`\{`), token(LBRACE))
     lexer.Add([]byte(`\}`), token(RBRACE))

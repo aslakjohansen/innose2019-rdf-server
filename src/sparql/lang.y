@@ -23,6 +23,7 @@ import (
 %token URI
 %token ID
 %token STRING
+%token ARROW
 
 %token LBRACE
 %token RBRACE
@@ -82,10 +83,32 @@ Query
         node.AddChild($4.ast)     // select
         yylex.(*golex).line = node
       }
-//    | DATA VarList UnitList SelectStatement {
-//      }
-//    | PrefixList DATA VarList UNITS UnitList SelectStatement {
-//      }
+    | DATA VarList UNITS UnitList SelectStatement {
+        datalist := $2.ast
+        datalist.CollapseChildList()
+        unitlist := $4.ast
+        unitlist.CollapseChildList()
+        node := NewNode("query", $1.token)
+        node.AddChild(NewNode("list", $1.token)) // missing prefix
+        node.AddChild(datalist) // data
+        node.AddChild(unitlist) // units
+        node.AddChild($5.ast)   // select
+        yylex.(*golex).line = node
+      }
+    | PrefixList DATA VarList UNITS UnitList SelectStatement {
+        prefixlist := $1.ast
+        prefixlist.CollapseChildList()
+        datalist := $3.ast
+        datalist.CollapseChildList()
+        unitlist := $5.ast
+        unitlist.CollapseChildList()
+        node := NewNode("query", $1.token)
+        node.AddChild(prefixlist) // prefix
+        node.AddChild(datalist)   // data
+        node.AddChild(unitlist)   // units
+        node.AddChild($6.ast)     // select
+        yylex.(*golex).line = node
+      }
     ;
 
 SelectStatement
@@ -95,7 +118,6 @@ SelectStatement
         reslist := $5.ast
         reslist.CollapseChildList()
         node := NewNode("select", $1.token)
-        node.AddChild(NewNode("list", $1.token)) // missing prefix
         node.AddChild(varlist)
         node.AddChild(reslist)
         $$.ast = node
@@ -122,6 +144,30 @@ Prefix
         node := NewNode("prefix", $1.token)
         node.AddChild($2.ast)
         node.AddChild($5.ast)
+        $$.ast = node
+      }
+    ;
+
+UnitList
+    : UnitPair UnitList {
+        node := NewNode("list", $1.token)
+        node.AddChild($1.ast)
+        node.AddChild($2.ast)
+        $$.ast = node
+        
+      }
+    | UnitPair {
+        node := NewNode("list", $1.token)
+        node.AddChild($1.ast)
+        $$.ast = node
+      }
+    ;
+
+UnitPair
+    : ConcreteEntity ARROW ConcreteEntity {
+        node := NewNode("mapping", $2.token)
+        node.AddChild($1.ast)
+        node.AddChild($3.ast)
         $$.ast = node
       }
     ;
@@ -185,7 +231,13 @@ Entity
     | Literal {
         $$.ast = $1.ast
       }
-    | LT URI GT {
+    | ConcreteEntity {
+        $$.ast = $1.ast
+      }
+    ;
+
+ConcreteEntity
+    : LT URI GT {
         $$.ast = $2.ast
       }
     | PrefixedEntity {
