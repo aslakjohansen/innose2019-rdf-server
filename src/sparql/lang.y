@@ -22,6 +22,8 @@ import (
 %token SELECT
 %token WHERE
 %token UNION
+%token DATA
+%token UNITS
 %token LBRACE
 %token RBRACE
 %token LT
@@ -39,21 +41,69 @@ import (
 
 %% /* The grammar follows.  */
 
-SelectStatement
-    : PrefixList SELECT VarList WHERE LBRACE RestrictionList RBRACE {
-        prefixlist := $1.ast
-        prefixlist.CollapseChildList()
-        varlist := $3.ast
-        varlist.CollapseChildList()
-        reslist := $6.ast
-        reslist.CollapseChildList()
-        node := NewNode("select", $1.token)
-        node.AddChild(prefixlist)
-        node.AddChild(varlist)
-        node.AddChild(reslist)
+Query
+    : SelectStatement {
+        node := NewNode("query", $1.token)
+        node.AddChild(NewNode("list", $1.token)) // missing prefix
+        node.AddChild(NewNode("list", $1.token)) // missing data
+        node.AddChild(NewNode("list", $1.token)) // missing units
+        node.AddChild($1.ast) // select
         yylex.(*golex).line = node
       }
-    | SELECT VarList WHERE LBRACE RestrictionList RBRACE {
+    | PrefixList SelectStatement {
+        prefixlist := $1.ast
+        prefixlist.CollapseChildList()
+        node := NewNode("query", $1.token)
+        node.AddChild(prefixlist) // prefix
+        node.AddChild(NewNode("list", $1.token)) // missing data
+        node.AddChild(NewNode("list", $1.token)) // missing units
+        node.AddChild($2.ast)     // select
+        yylex.(*golex).line = node
+      }
+    | DATA VarList SelectStatement {
+        datalist := $2.ast
+        datalist.CollapseChildList()
+        node := NewNode("query", $1.token)
+        node.AddChild(NewNode("list", $1.token)) // missing prefix
+        node.AddChild(datalist) // data
+        node.AddChild(NewNode("list", $1.token)) // missing units
+        node.AddChild($3.ast)   // select
+        yylex.(*golex).line = node
+      }
+    | PrefixList DATA VarList SelectStatement {
+        prefixlist := $1.ast
+        prefixlist.CollapseChildList()
+        datalist := $3.ast
+        datalist.CollapseChildList()
+        node := NewNode("query", $1.token)
+        node.AddChild(prefixlist) // prefix
+        node.AddChild(datalist)   // data
+        node.AddChild(NewNode("list", $1.token)) // missing units
+        node.AddChild($4.ast)     // select
+        yylex.(*golex).line = node
+      }
+//    | DATA VarList UnitList SelectStatement {
+//      }
+//    | PrefixList DATA VarList UNITS UnitList SelectStatement {
+//      }
+    ;
+
+SelectStatement
+//    : PrefixList SELECT VarList WHERE LBRACE RestrictionList RBRACE {
+//        prefixlist := $1.ast
+//        prefixlist.CollapseChildList()
+//        varlist := $3.ast
+//        varlist.CollapseChildList()
+//        reslist := $6.ast
+//        reslist.CollapseChildList()
+//        node := NewNode("select", $1.token)
+//        node.AddChild(prefixlist)
+//        node.AddChild(varlist)
+//        node.AddChild(reslist)
+//        yylex.(*golex).line = node
+//      }
+//    |
+    : SELECT VarList WHERE LBRACE RestrictionList RBRACE {
         varlist := $2.ast
         varlist.CollapseChildList()
         reslist := $5.ast
@@ -62,7 +112,8 @@ SelectStatement
         node.AddChild(NewNode("list", $1.token)) // missing prefix
         node.AddChild(varlist)
         node.AddChild(reslist)
-        yylex.(*golex).line = node
+//        yylex.(*golex).line = node
+        $$.ast = node
       }
     ;
 

@@ -32,6 +32,8 @@ func main () {
       "PREFIX a:<http://b> SELECT ?var1 ?var2 WHERE { ?var1 ?var2 ?var3 . }",
       "PREFIX a:<http://b> PREFIX c:<http://d> SELECT ?var1 ?var2 WHERE { ?var1 ?var2 ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { a:b ?var2 ?var3 . }",
+      "DATA ?var1 ?var3 SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
+      "PREFIX a:<http://b> DATA ?var1 ?var3 SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
     }
     
     for _, input := range inputs {
@@ -42,7 +44,6 @@ func main () {
         for _, token := range tokens {
             fmt.Println(" -", token)
         }
-        fmt.Println("")
         
         line, err := sparql.Parse(lexer, input)
         if err != nil {
