@@ -73,6 +73,10 @@ func skip (*lexmachine.Scanner, *machines.Match) (interface{}, error) {
     return nil, nil
 }
 
+//func (l *golex) Normalize () (string, error) {
+//    return l.line.Normalize("")
+//}
+
 func (l *golex) Error (message string) {
     panic(fmt.Errorf(message))
 }

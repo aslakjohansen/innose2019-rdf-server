@@ -3,6 +3,7 @@ package sparql
 import (
     "fmt"
     "strings"
+    "errors"
     
     "github.com/timtadh/lexmachine"
 )
@@ -70,6 +71,128 @@ func (n *Node) CollapseChildList () *Node {
     n.Children = result
     
     return n
+}
+
+func (n *Node) Normalize (indent string) (string, error) {
+    var result  string = ""
+    var cresult string
+    var err     error  = nil
+    
+    switch n.Name {
+    case "query":
+        // prefix
+        if len(n.Children[0].Children)>0 {
+            for _, child := range n.Children[0].Children {
+                cresult, err = child.Normalize("")
+                if err!=nil {
+                    break
+                }
+                result += cresult
+            }
+            result += fmt.Sprintf("%s\n", indent)
+        }
+        
+        // data
+        if len(n.Children[1].Children)>0 {
+            result += fmt.Sprintf("%sDATA\n", indent)
+            for _, child := range n.Children[1].Children {
+                cresult, err = child.Normalize("")
+                if err!=nil {
+                    break
+                }
+                result += fmt.Sprintf("%s    %s\n", indent, cresult)
+            }
+        }
+        
+        // units
+        if len(n.Children[2].Children)>0 {
+            result += fmt.Sprintf("%sUNITS\n", indent)
+            for _, child := range n.Children[2].Children {
+                cresult, err = child.Normalize("")
+                if err!=nil {
+                    break
+                }
+                result += fmt.Sprintf("%s    %s", indent, cresult)
+            }
+        }
+        
+        // select
+        cresult, err = n.Children[3].Normalize("")
+        if err!=nil {
+            break
+        }
+        result += cresult
+    case "select":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    case "list":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    case "prefix":
+        var id string
+        id, err = n.Children[0].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        var uri string
+        uri, err = n.Children[1].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        result = fmt.Sprintf("%sPREFIX %s: <%s>\n", indent, id, uri)
+    case "mapping":
+        var key string
+        key, err = n.Children[0].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        var value string
+        value, err = n.Children[1].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        result = fmt.Sprintf("%s%s -> %s\n", indent, key, value)
+    case "var":
+        result = string(n.Token.Lexeme)
+    case "restriction":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    case "union":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    case "uri":
+        result = string(n.Token.Lexeme)
+    case "id":
+        result = string(n.Token.Lexeme)
+    case "prefixed":
+        var namespace string
+        namespace, err = n.Children[0].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        var name string
+        name, err = n.Children[1].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        result = fmt.Sprintf("%s:%s", namespace, name)
+    case "string":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    case "sequence":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    case "choice":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    case "one-or-more":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    case "zero-or-more":
+        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+    default:
+        err = errors.New(fmt.Sprintf("No case handler defined for normalizing a node with name \"%s\".", n.Name))
+    }
+    
+    return result, err
 }
 
 func (n *Node) String () string {

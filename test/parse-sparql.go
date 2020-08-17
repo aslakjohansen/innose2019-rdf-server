@@ -7,6 +7,10 @@ import (
 )
 
 func main () {
+    var line  string
+    var err   error
+    var node *sparql.Node
+    
     var lexer = sparql.NewLexer(true)
     
     var inputs []string = []string{
@@ -47,11 +51,21 @@ func main () {
             fmt.Println(" -", token)
         }
         
-        line, err := sparql.Parse(lexer, input)
+        node, err = sparql.Parse(lexer, input)
         if err != nil {
             fmt.Println("[PARSE] Error parsing:", err)
         } else {
-            fmt.Println("[PARSE]", line)
+            fmt.Println("[PARSE]", node)
+        }
+        
+        if node!=nil {
+            line, err = node.Normalize("")
+            if err != nil {
+                fmt.Println("[NORM] Normalized error:", err)
+            } else {
+                fmt.Println("[NORM]")
+                fmt.Print(line)
+            }
         }
         
         fmt.Println("")
