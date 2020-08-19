@@ -22,6 +22,10 @@ deps:
 	go get github.com/timtadh/lexmachine
 
 
+
+sparql/y.go: sparql/lang.y
+	cd sparql ; goyacc lang.y
+
 ../var/model:
 	mkdir ../var/model
 
