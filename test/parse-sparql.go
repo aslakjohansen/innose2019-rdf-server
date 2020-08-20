@@ -46,12 +46,14 @@ func main () {
     for _, input := range inputs {
         fmt.Println("Case:", input)
         
+        // token sequence
         tokens, _ := sparql.Tokens(lexer, []byte(input))
         fmt.Println("[TOKENS]")
         for _, token := range tokens {
             fmt.Println(" -", token)
         }
         
+        // parse tree
         node, err = sparql.Parse(lexer, input)
         if err != nil {
             fmt.Println("[PARSE] Error parsing:", err)
@@ -59,6 +61,7 @@ func main () {
             fmt.Println("[PARSE]", node)
         }
         
+        // normalized parse tree
         if err==nil {
             line, err = node.Normalize("")
             if err != nil {
