@@ -10,6 +10,7 @@ func main () {
 //    var line  string
     var err   error
     var node *sparql.Node
+    var line  string
     
     var lexer = sparql.NewLexer(true)
     
@@ -58,15 +59,15 @@ func main () {
             fmt.Println("[PARSE]", node)
         }
         
-//        if err==nil {
-//            line, err = node.Normalize("")
-//            if err != nil {
-//                fmt.Println("[NORM] Normalized error:", err)
-//            } else {
-//                fmt.Println("[NORM]")
-//                fmt.Print(line)
-//            }
-//        }
+        if err==nil {
+            line, err = node.Normalize("")
+            if err != nil {
+                fmt.Println("[NORM] Normalized error:", err)
+            } else {
+                fmt.Println("[NORM]")
+                fmt.Print(line)
+            }
+        }
         
         fmt.Println("")
     }
