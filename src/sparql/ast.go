@@ -78,6 +78,12 @@ func (n *Node) Normalize (indent string) (string, error) {
     var cresult string
     var err     error  = nil
     
+    if n==nil {
+        fmt.Println("n==nil")
+        return "", errors.New("Error: Unable to marshal nil node.")
+    } else {
+        fmt.Println(n, n.Children)
+    }
     switch n.Name {
     case "query":
         // prefix
@@ -123,7 +129,27 @@ func (n *Node) Normalize (indent string) (string, error) {
         }
         result += cresult
     case "select":
-        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+        // select
+        result += fmt.Sprintf("%sSELECT", indent)
+        for _, child := range n.Children[0].Children {
+            cresult, err = child.Normalize("")
+            if err!=nil {
+                break
+            }
+            result += " "+cresult
+        }
+        result += fmt.Sprintf("\n")
+        
+        // where
+        result += fmt.Sprintf("%sWHERE {\n", indent)
+        for _, child := range n.Children[1].Children {
+            cresult, err = child.Normalize("    ")
+            if err!=nil {
+                break
+            }
+            result += " "+cresult
+        }
+        result += fmt.Sprintf("%s}\n", indent)
     case "list":
         result = fmt.Sprintf("'%s contents missing'\n", n.Name)
     case "prefix":
@@ -157,7 +183,25 @@ func (n *Node) Normalize (indent string) (string, error) {
     case "var":
         result = string(n.Token.Lexeme)
     case "restriction":
-        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+        var sub string
+        sub, err = n.Children[0].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        var pred string
+        pred, err = n.Children[1].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        var objz string = ":-("
+        objz, err = n.Children[2].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        result = fmt.Sprintf("%s%s %s %s .\n", indent, sub, pred, objz)
     case "union":
         result = fmt.Sprintf("'%s contents missing'\n", n.Name)
     case "uri":

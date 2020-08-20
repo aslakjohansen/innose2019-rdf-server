@@ -3,6 +3,7 @@
 package sparql
 
 import (
+    "fmt"
     "github.com/timtadh/lexmachine"
 )
 
@@ -232,12 +233,14 @@ Entity
         $$.ast = $1.ast
       }
     | ConcreteEntity {
+        fmt.Println("Entity-ConcreteEntity:", $1.token, $1.ast)
         $$.ast = $1.ast
       }
     ;
 
 ConcreteEntity
-    : LT URI GT {
+    : LT Uri GT {
+        fmt.Println("ConcreteEntity-LT URI GT:", $2.token, $2.ast)
         $$.ast = $2.ast
       }
     | PrefixedEntity {
@@ -247,6 +250,7 @@ ConcreteEntity
 
 Uri
     : URI {
+        fmt.Println("Uri-URI:", $1.token)
         $$.ast = NewNode("uri", $1.token)
       }
     ;
