@@ -7,7 +7,6 @@ import (
 )
 
 func main () {
-//    var line  string
     var err   error
     var node *sparql.Node
     var line  string
