@@ -78,12 +78,6 @@ func (n *Node) Normalize (indent string) (string, error) {
     var cresult string
     var err     error  = nil
     
-    if n==nil {
-        fmt.Println("n==nil")
-        return "", errors.New("Error: Unable to marshal nil node.")
-    } else {
-        fmt.Println(n, n.Children)
-    }
     switch n.Name {
     case "query":
         // prefix
