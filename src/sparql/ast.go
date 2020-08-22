@@ -147,7 +147,7 @@ func (n *Node) Normalize (indent string) (string, error) {
             if err!=nil {
                 break
             }
-            result += " "+cresult
+            result += cresult
         }
         result += fmt.Sprintf("%s}\n", indent)
     case "list":
@@ -203,7 +203,23 @@ func (n *Node) Normalize (indent string) (string, error) {
         
         result = fmt.Sprintf("%s%s %s %s .\n", indent, sub, pred, objz)
     case "union":
-        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+        var first string
+        first, err = n.Children[0].Normalize(indent+"    ")
+        if err!=nil {
+            break
+        }
+        
+        var second string
+        second, err = n.Children[1].Normalize(indent+"    ")
+        if err!=nil {
+            break
+        }
+        
+        result += fmt.Sprintf("%s{\n", indent)
+        result += first
+        result += fmt.Sprintf("%s} UNION {\n", indent)
+        result += second
+        result += fmt.Sprintf("%s} .\n", indent)
     case "uri":
         result = string(n.Token.Lexeme)
     case "id":
