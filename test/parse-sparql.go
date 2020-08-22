@@ -60,13 +60,24 @@ func main () {
             fmt.Println("[PARSE]", node)
         }
         
-        // normalized parse tree
+        // normalized query
         if err==nil {
             line, err = node.Normalize("")
             if err != nil {
                 fmt.Println("[NORM] Normalized error:", err)
             } else {
                 fmt.Println("[NORM]")
+                fmt.Print(line)
+            }
+        }
+        
+        // sparqlified query
+        if err==nil {
+            line, err = node.Resparql("")
+            if err != nil {
+                fmt.Println("[RESPARQL] Sparqlification error:", err)
+            } else {
+                fmt.Println("[RESPARQL]")
                 fmt.Print(line)
             }
         }

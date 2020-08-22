@@ -159,9 +159,23 @@ func JsonInspect (indent string, query string) string {
         return response
     }
     
+    resparql_line, err := parse_data.Resparql("")
+    if err!=nil {
+        s, _ := json.Marshal(fmt.Sprint(err))
+        response += fmt.Sprintf("{\n")
+        response += fmt.Sprintf("%s    \"success\": false,\n", indent)
+        response += fmt.Sprintf("%s    \"error\": {\n", indent)
+        response += fmt.Sprintf("%s        \"type\": \"resparql\",\n", indent)
+        response += fmt.Sprintf("%s        \"data\": %s\n", indent, s)
+        response += fmt.Sprintf("%s    }\n", indent)
+        response += fmt.Sprintf("%s}", indent)
+        return response
+    }
+    
     // format result
-    s_parse, _ := json.Marshal(parse_data.String())
-    s_norm, _ := json.Marshal(norm_line)
+    s_parse   , _ := json.Marshal(parse_data.String())
+    s_norm    , _ := json.Marshal(norm_line)
+    s_resparql, _ := json.Marshal(resparql_line)
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("%s    \"success\": true,\n", indent)
     response += fmt.Sprintf("%s    \"tokens\": [\n", indent)
@@ -174,7 +188,8 @@ func JsonInspect (indent string, query string) string {
     }
     response += fmt.Sprintf("%s    ],\n", indent)
     response += fmt.Sprintf("%s    \"sexp\": %s,\n", indent, s_parse)
-    response += fmt.Sprintf("%s    \"norm\": %s\n", indent, s_norm)
+    response += fmt.Sprintf("%s    \"norm\": %s,\n", indent, s_norm)
+    response += fmt.Sprintf("%s    \"resparql\": %s\n", indent, s_resparql)
     response += fmt.Sprintf("%s}", indent)
     
     return response

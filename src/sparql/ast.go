@@ -73,6 +73,24 @@ func (n *Node) CollapseChildList () *Node {
     return n
 }
 
+func (n *Node) Resparql (indent string) (string, error) {
+    var result  string = ""
+    var err     error  = nil
+    
+    switch n.Name {
+    case "query":
+        clone := *n
+        clone.Children[1].Children = make([]*Node, 0) // data
+        clone.Children[2].Children = make([]*Node, 0) // units
+        result, err = clone.Normalize(indent)
+    case "select":
+        result, err = n.Normalize(indent)
+    default:
+        err = errors.New(fmt.Sprintf("No case handler defined for sparqlifying a node with name \"%s\".", n.Name))
+    }
+    return result, err
+}
+
 func (n *Node) Normalize (indent string) (string, error) {
     var result  string = ""
     var cresult string
