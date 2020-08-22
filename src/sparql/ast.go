@@ -223,15 +223,49 @@ func (n *Node) Normalize (indent string) (string, error) {
         
         result = fmt.Sprintf("%s:%s", namespace, name)
     case "string":
-        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+        result = string(n.Token.Lexeme)
     case "sequence":
-        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+        var first string
+        first, err = n.Children[0].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        var second string
+        second, err = n.Children[1].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        result = fmt.Sprintf("%s/%s", first, second)
     case "choice":
-        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+        var first string
+        first, err = n.Children[0].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        var second string
+        second, err = n.Children[1].Normalize("")
+        if err!=nil {
+            break
+        }
+        
+        result = fmt.Sprintf("(%s|%s)", first, second)
     case "one-or-more":
-        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+        var subpath string
+        subpath, err = n.Children[0].Normalize("")
+        if err!=nil {
+            break
+        }
+        result = fmt.Sprintf("%s+", subpath)
     case "zero-or-more":
-        result = fmt.Sprintf("'%s contents missing'\n", n.Name)
+        var subpath string
+        subpath, err = n.Children[0].Normalize("")
+        if err!=nil {
+            break
+        }
+        result = fmt.Sprintf("%s*", subpath)
     default:
         err = errors.New(fmt.Sprintf("No case handler defined for normalizing a node with name \"%s\".", n.Name))
     }
