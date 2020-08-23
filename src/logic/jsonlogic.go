@@ -146,6 +146,7 @@ func JsonInspect (indent string, query string) string {
         return response
     }
     
+    // normalize
     norm_line, err := parse_data.Normalize("")
     if err!=nil {
         s, _ := json.Marshal(fmt.Sprint(err))
@@ -159,6 +160,7 @@ func JsonInspect (indent string, query string) string {
         return response
     }
     
+    // resparql
     resparql_line, err := parse_data.Resparql("")
     if err!=nil {
         s, _ := json.Marshal(fmt.Sprint(err))
