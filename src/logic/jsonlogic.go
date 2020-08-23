@@ -63,10 +63,9 @@ func JsonNamespaces (indent string) string {
 func JsonQuery (indent string, query string) string {
     var success bool
     var result [][]string
-    result, success = Query(query)
-    
     var response string = ""
     
+    result, success = Query(query)
     if success==false {
         response += fmt.Sprintf("{\n")
         response += fmt.Sprintf("%s    \"success\": false,\n", indent)
