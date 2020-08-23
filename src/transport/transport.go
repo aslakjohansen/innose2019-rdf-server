@@ -29,6 +29,7 @@ func Init (iface string, port string, model_dir_arg *string) {
         http.HandleFunc("/namespaces", namespace_handler)
         http.HandleFunc("/query"     , query_handler)
         http.HandleFunc("/update"    , update_handler)
+        http.HandleFunc("/inspect"   , inspect_handler)
         http.HandleFunc("/websocket" , websocket_handler)
         
         // start listening
@@ -107,6 +108,30 @@ func update_handler (rw http.ResponseWriter, request *http.Request) {
     }
     
     var result string = logic.JsonUpdate("", query_str)+"\n"
+    rw.Write([]byte(result))
+}
+
+func inspect_handler (rw http.ResponseWriter, request *http.Request) {
+    query, err := ioutil.ReadAll(request.Body)
+    if err != nil {
+        rw.Write([]byte("{\n"))
+        rw.Write([]byte("    \"success\": false,\n"))
+        rw.Write([]byte("    \"error\": \"unable to read query\"\n"))
+        rw.Write([]byte("}\n"))
+        return
+    }
+    
+    var query_str string
+    err = json.Unmarshal(query, &query_str)
+    if err!=nil {
+        rw.Write([]byte("{\n"))
+        rw.Write([]byte("    \"success\": false,\n"))
+        rw.Write([]byte("    \"error\": \"malformed query\"\n"))
+        rw.Write([]byte("}\n"))
+        return
+    }
+    
+    var result string = logic.JsonInspect("", query_str)+"\n"
     rw.Write([]byte(result))
 }
 

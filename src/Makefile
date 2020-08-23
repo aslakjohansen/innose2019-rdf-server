@@ -3,6 +3,7 @@ TARGETS = \
 	rdf-server \
 
 
+
 all: ${TARGETS} ../var/model
 	PYTHONPATH=. ./rdf-server 0.0.0.0 8001 ../var/model ../var/ontologies
 
@@ -18,7 +19,13 @@ deps:
 	go get github.com/sbinet/go-python
 	go get github.com/gorilla/websocket
 	go get github.com/peterh/liner
+	go get -u golang.org/x/tools/cmd/goyacc
+	go get github.com/timtadh/lexmachine
 
+
+
+sparql/y.go: sparql/lang.y
+	cd sparql ; goyacc lang.y
 
 ../var/model:
 	mkdir ../var/model

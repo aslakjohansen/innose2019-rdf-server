@@ -872,3 +872,42 @@ $ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n
 - a where clause must exist
 - no slashes in entity names
 
+### Inspecting a query
+
+```shell
+$ curl -X PUT -d '"! SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhost:8001/inspect
+{
+    "success": false,
+    "error": {
+        "type": "lex",
+        "data": "Lexer error: could not match text starting at 1:1 failing at 1:2.\n\tunmatched text: \"!\""
+    }
+}
+$ curl -X PUT -d '"SELECT SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhost:8001/inspect
+{
+    "success": false,
+    "error": {
+        "type": "parse",
+        "data": "syntax error"
+    }
+}
+$ curl -X PUT -d '"SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhost:8001/inspect
+{
+    "success": true,
+    "tokens": [
+        "57352 "SELECT" 0 (1, 1)-(1, 6)",
+        "57346 "?pred" 7 (1, 8)-(1, 12)",
+        "57346 "?obj" 13 (1, 14)-(1, 17)",
+        "57353 "WHERE" 18 (1, 19)-(1, 23)",
+        "57355 "{" 24 (1, 25)-(1, 25)",
+        "57346 "?sub" 25 (1, 26)-(1, 29)",
+        "57346 "?pred" 30 (1, 31)-(1, 35)",
+        "57346 "?obj" 36 (1, 37)-(1, 40)",
+        "57359 "." 41 (1, 42)-(1, 42)",
+        "57356 "}" 42 (1, 43)-(1, 43)"
+    ],
+    "sexp": "(select \"SELECT\" (list \"SELECT\") (list \"?pred\" (var \"?pred\") (var \"?obj\")) (list \"?sub\" (restriction \"?sub\" (var \"?sub\") (var \"?pred\") (var \"?obj\"))))"
+}
+```
+
+**Note:** This may provide useful insights while debugging.
