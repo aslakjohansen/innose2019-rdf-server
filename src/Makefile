@@ -16,11 +16,23 @@ mrproper:
 	rm -R *~ __pycache__
 
 deps:
+	# embedding python
 	go get github.com/sbinet/go-python
+	
+	# websocket
 	go get github.com/gorilla/websocket
+	
+	# command line interpreter
 	go get github.com/peterh/liner
+	
+	# parser generation
 	go get -u golang.org/x/tools/cmd/goyacc
 	go get github.com/timtadh/lexmachine
+	
+	# mqtt
+	go get github.com/eclipse/paho.mqtt.golang
+	go get github.com/gorilla/websocket
+	go get golang.org/x/net/proxy
 
 
 
