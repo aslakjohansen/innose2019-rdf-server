@@ -9,6 +9,9 @@ This server is a [Go](https://golang.org) program that wraps some [Python](https
   - `rdflib` (both 4.2.2 and 5.0.0 have been tested)
   - `requests` (for some reason rdflib makes use of it without depending on it)
 
+For testin:
+- `mosquitto-clients` (manual MQTT publication)
+
 ## Building
 
 ```shell
@@ -911,3 +914,16 @@ $ curl -X PUT -d '"SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhos
 ```
 
 **Note:** This may provide useful insights while debugging.
+
+### Send valid data over MQTT
+
+```shell
+$ mosquitto_pub -t "test" -m "{\"time\": 1234.5678, \"value\": 42.56}"
+```
+
+### Send invalid data over MQTT
+
+```shell
+$ mosquitto_pub -t "test" -m "blah"
+```
+
