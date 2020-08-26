@@ -5,6 +5,7 @@ import (
     "time"
     "os"
     "log"
+    "encoding/json"
     "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -16,11 +17,31 @@ var (
     sub_pattern string = "#"
     
     c mqtt.Client
+    
+    dispatch map[string](chan Reading) = make(map[string](chan Reading))
 )
+
+type Reading struct {
+    Timestamp float64 `json:"time"`
+    Value     float64 `json:"value"`
+}
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
     fmt.Printf("TOPIC: %s\n", msg.Topic())
     fmt.Printf("MSG: %s\n", msg.Payload())
+    
+    var reading Reading
+    
+    err := json.Unmarshal(msg.Payload(), &reading)
+    if err!=nil {
+        fmt.Println(fmt.Sprintf("Error: Unable to unmarchal reading received over MQTT topic '%s': '%s'", msg.Topic(), msg.Payload()))
+        return
+    }
+    
+    value, ok := dispatch[msg.Topic()]
+    if ok {
+        value <- reading
+    }
 }
 
 func Init () {
@@ -46,6 +67,15 @@ func Init () {
     if token := c.Subscribe(sub_pattern, 1, f); token.Wait() && token.Error()!=nil {
         fmt.Println("Error: MQTT subscription failed:", token.Error())
     }
+    
+    dispatch["test"] = make(chan Reading)
+    
+    go func (channel chan Reading) {
+        for {
+            var r Reading = <- channel
+            fmt.Println(fmt.Sprintf("MQTT reception: time='%f' value'%f'", r.Timestamp, r.Value))
+        }
+    }(dispatch["test"])
 }
 
 func Finalize () {
