@@ -5,7 +5,6 @@ import (
     "time"
     "os"
     "log"
-//    "encoding/json"
     
     "github.com/eclipse/paho.mqtt.golang"
     
@@ -25,20 +24,11 @@ var (
 )
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-//    fmt.Printf("TOPIC: %s\n", msg.Topic())
-//    fmt.Printf("MSG: %s\n", msg.Payload())
-    
     var reading *reading.Reading = reading.NewFromJSON(msg.Payload())
     if reading==nil {
         fmt.Println(fmt.Sprintf("Error: Unable to unmarchal reading received over MQTT topic '%s': '%s'", msg.Topic(), msg.Payload()))
         return
     }
-    
-//    err := json.Unmarshal(msg.Payload(), &reading)
-//    if err!=nil {
-//        fmt.Println(fmt.Sprintf("Error: Unable to unmarchal reading received over MQTT topic '%s': '%s'", msg.Topic(), msg.Payload()))
-//        return
-//    }
     
     channel, ok := dispatch[msg.Topic()]
     if ok {
@@ -75,7 +65,6 @@ func Init () {
     go func (channel chan reading.Reading) {
         for {
             var r reading.Reading = <- channel
-//            fmt.Println(fmt.Sprintf("MQTT reception: time='%f' value'%f'", r.Timestamp, r.Value))
             fmt.Println(r)
         }
     }(dispatch["test"])
