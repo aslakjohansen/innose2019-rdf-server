@@ -9,6 +9,7 @@ import (
     "github.com/eclipse/paho.mqtt.golang"
     
     "innose2019-rdf-server/data/reading"
+    "innose2019-rdf-server/data/dispatch"
 )
 
 var (
@@ -20,7 +21,8 @@ var (
     
     c mqtt.Client
     
-    dispatch map[string](chan reading.Reading) = make(map[string](chan reading.Reading))
+    dispatcher *dispatch.Dispatcher
+//    dispatch map[string](chan reading.Reading) = make(map[string](chan reading.Reading))
 )
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -30,10 +32,11 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
         return
     }
     
-    channel, ok := dispatch[msg.Topic()]
-    if ok {
-        channel <- *reading
-    }
+    dispatcher.Dispatch(msg.Topic(), reading)
+//    channel, ok := dispatch[msg.Topic()]
+//    if ok {
+//        channel <- *reading
+//    }
 }
 
 func Init () {
@@ -60,14 +63,18 @@ func Init () {
         fmt.Println("Error: MQTT subscription failed:", token.Error())
     }
     
-    dispatch["test"] = make(chan reading.Reading)
+    dispatcher = dispatch.NewDispatcher()
+    
+    channel := dispatcher.Register("test", make(chan reading.Reading))
+//    dispatch["test"] = make(chan reading.Reading)
     
     go func (channel chan reading.Reading) {
         for {
             var r reading.Reading = <- channel
             fmt.Println(r)
         }
-    }(dispatch["test"])
+//    }(dispatch["test"])
+    }(channel)
 }
 
 func Finalize () {
