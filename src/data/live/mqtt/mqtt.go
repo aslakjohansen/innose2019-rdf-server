@@ -22,7 +22,6 @@ var (
     c mqtt.Client
     
     dispatcher *dispatch.Dispatcher
-//    dispatch map[string](chan reading.Reading) = make(map[string](chan reading.Reading))
 )
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -33,10 +32,6 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
     }
     
     dispatcher.Dispatch(msg.Topic(), reading)
-//    channel, ok := dispatch[msg.Topic()]
-//    if ok {
-//        channel <- *reading
-//    }
 }
 
 func Init () {
@@ -64,16 +59,13 @@ func Init () {
     }
     
     dispatcher = dispatch.NewDispatcher()
-    
     channel := dispatcher.Register("test", make(chan reading.Reading))
-//    dispatch["test"] = make(chan reading.Reading)
     
     go func (channel chan reading.Reading) {
         for {
             var r reading.Reading = <- channel
             fmt.Println(r)
         }
-//    }(dispatch["test"])
     }(channel)
 }
 
