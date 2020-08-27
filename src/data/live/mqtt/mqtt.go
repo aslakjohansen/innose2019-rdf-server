@@ -5,8 +5,11 @@ import (
     "time"
     "os"
     "log"
-    "encoding/json"
+//    "encoding/json"
+    
     "github.com/eclipse/paho.mqtt.golang"
+    
+    "innose2019-rdf-server/data/reading"
 )
 
 var (
@@ -18,29 +21,28 @@ var (
     
     c mqtt.Client
     
-    dispatch map[string](chan Reading) = make(map[string](chan Reading))
+    dispatch map[string](chan reading.Reading) = make(map[string](chan reading.Reading))
 )
-
-type Reading struct {
-    Timestamp float64 `json:"time"`
-    Value     float64 `json:"value"`
-}
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 //    fmt.Printf("TOPIC: %s\n", msg.Topic())
 //    fmt.Printf("MSG: %s\n", msg.Payload())
     
-    var reading Reading
-    
-    err := json.Unmarshal(msg.Payload(), &reading)
-    if err!=nil {
+    var reading *reading.Reading = reading.NewFromJSON(msg.Payload())
+    if reading==nil {
         fmt.Println(fmt.Sprintf("Error: Unable to unmarchal reading received over MQTT topic '%s': '%s'", msg.Topic(), msg.Payload()))
         return
     }
     
-    value, ok := dispatch[msg.Topic()]
+//    err := json.Unmarshal(msg.Payload(), &reading)
+//    if err!=nil {
+//        fmt.Println(fmt.Sprintf("Error: Unable to unmarchal reading received over MQTT topic '%s': '%s'", msg.Topic(), msg.Payload()))
+//        return
+//    }
+    
+    channel, ok := dispatch[msg.Topic()]
     if ok {
-        value <- reading
+        channel <- *reading
     }
 }
 
@@ -68,12 +70,13 @@ func Init () {
         fmt.Println("Error: MQTT subscription failed:", token.Error())
     }
     
-    dispatch["test"] = make(chan Reading)
+    dispatch["test"] = make(chan reading.Reading)
     
-    go func (channel chan Reading) {
+    go func (channel chan reading.Reading) {
         for {
-            var r Reading = <- channel
-            fmt.Println(fmt.Sprintf("MQTT reception: time='%f' value'%f'", r.Timestamp, r.Value))
+            var r reading.Reading = <- channel
+//            fmt.Println(fmt.Sprintf("MQTT reception: time='%f' value'%f'", r.Timestamp, r.Value))
+            fmt.Println(r)
         }
     }(dispatch["test"])
 }

@@ -45,6 +45,6 @@ sparql/y.go: sparql/lang.y
 rdf-client: rdf-client.go
 	go build -x rdf-client.go
 
-rdf-server: rdf-server.go */*.go */*/*/*.go
+rdf-server: rdf-server.go */*.go */*/*.go */*/*/*.go
 	go build -x rdf-server.go
 
