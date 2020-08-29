@@ -41,6 +41,26 @@ func (d Dispatcher) Register (id string, channel chan reading.Reading) chan read
     return channel
 }
 
+func (d Dispatcher) Unregister (id string, channel chan reading.Reading) bool {
+    d.mutex.Lock()
+    defer d.mutex.Unlock()
+    
+    entries, ok := d.lut[id]
+    if !ok {
+        return false
+    }
+    
+    i, ok := locate(entries, channel)
+    if !ok {
+        return false
+    }
+    
+    (*entries)[i] = (*entries)[len(*entries)-1]
+    *entries = (*entries)[:len(*entries)-1]
+    
+    return true
+}
+
 func (d Dispatcher) Dispatch (id string, r *reading.Reading) bool {
     channels, ok := d.lut[id]
     
@@ -71,3 +91,12 @@ func contains (array *[]chan reading.Reading, value chan reading.Reading) bool {
     return false
 }
 
+func locate (array *[]chan reading.Reading, value chan reading.Reading) (int, bool) {
+    for i:=0 ; i<len(*array) ; i++ {
+        if (*array)[i] == value {
+            return i, true
+        }
+    }
+    
+    return -1, false
+}

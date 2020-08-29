@@ -28,8 +28,8 @@ func main () {
         make(chan reading.Reading),
     }
     
-    fmt.Println("Adding:")
-    fmt.Println("~~~~~~")
+    fmt.Println("Registering:")
+    fmt.Println("~~~~~~~~~~~")
     d.Register("a", as[0])
     d.Register("a", as[1])
     d.Register("a", as[2])
@@ -40,6 +40,30 @@ func main () {
     d.Register("b", bs[2])
     d.Register("c", cs[1])
     d.Register("d", ds[0])
+    d.Print()
+    fmt.Println("")
+    
+    fmt.Println("Unregistering (not registered):")
+    fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    d.Unregister("a", ds[0])
+    d.Print()
+    fmt.Println("")
+    
+    fmt.Println("Unregistering (beginning):")
+    fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    d.Unregister("a", as[0])
+    d.Print()
+    fmt.Println("")
+    
+    fmt.Println("Unregistering (middle):")
+    fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~")
+    d.Unregister("a", as[2])
+    d.Print()
+    fmt.Println("")
+    
+    fmt.Println("Unregistering (end):")
+    fmt.Println("~~~~~~~~~~~~~~~~~~~~")
+    d.Unregister("b", bs[2])
     d.Print()
     fmt.Println("")
 }
