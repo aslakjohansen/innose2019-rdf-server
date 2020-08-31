@@ -7,6 +7,7 @@ import (
     "innose2019-rdf-server/data/reading"
 )
 
+// TODO: Determine if this struct is necessary and we need the cancel field (or if the mutex in dispatch is enough)
 type DispatchEntry struct {
     stream chan reading.Reading
     cancel chan bool
@@ -52,23 +53,37 @@ func (d Dispatcher) Unregister (id string, channel chan reading.Reading) bool {
     d.mutex.Lock()
     defer d.mutex.Unlock()
     
+    // locate group
     entries, ok := d.lut[id]
     if !ok {
         return false
     }
     
+    // locate entry
     i, ok := locate(entries, channel)
     if !ok {
         return false
     }
     
+    // array manipulation
+    var entry DispatchEntry = (*entries)[i]
     (*entries)[i] = (*entries)[len(*entries)-1]
     *entries = (*entries)[:len(*entries)-1]
+    
+    // cleanup
+    go func (entry DispatchEntry) {
+//        entry.cancel <- true // signal cancelation
+        close(entry.stream)
+        for range entry.stream {} // empty stream for remaining data
+    }(entry)
     
     return true
 }
 
 func (d Dispatcher) Dispatch (id string, r *reading.Reading) bool {
+    d.mutex.Lock()
+    defer d.mutex.Unlock()
+    
     entries, ok := d.lut[id]
     
     if ok {
