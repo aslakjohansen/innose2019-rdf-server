@@ -7,9 +7,14 @@ import (
     "innose2019-rdf-server/data/reading"
 )
 
+type DispatchEntry struct {
+    stream chan reading.Reading
+    cancel chan bool
+}
+
 type Dispatcher struct {
     mutex sync.Mutex
-    lut map[string](*[] chan reading.Reading)
+    lut map[string](*[] DispatchEntry)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -18,7 +23,7 @@ type Dispatcher struct {
 func NewDispatcher () *Dispatcher {
     var d Dispatcher
     
-    d.lut = make(map[string](*[]chan reading.Reading))
+    d.lut = make(map[string](*[] DispatchEntry))
     
     return &d
 }
@@ -28,13 +33,15 @@ func (d Dispatcher) Register (id string, channel chan reading.Reading) chan read
     
     entries, ok := d.lut[id]
     if !ok {
-        newalloc := make([]chan reading.Reading, 0)
+        newalloc := make([] DispatchEntry, 0)
         entries = &newalloc
         d.lut[id] = entries
     }
     
     if !contains(entries, channel) {
-        *entries = append(*entries, channel)
+        var entry DispatchEntry = DispatchEntry{channel, make(chan bool)}
+        
+        *entries = append(*entries, entry)
     }
     
     d.mutex.Unlock()
@@ -62,11 +69,11 @@ func (d Dispatcher) Unregister (id string, channel chan reading.Reading) bool {
 }
 
 func (d Dispatcher) Dispatch (id string, r *reading.Reading) bool {
-    channels, ok := d.lut[id]
+    entries, ok := d.lut[id]
     
     if ok {
-        for _, channel := range *channels {
-            channel <- *r
+        for _, entry := range *entries {
+            entry.stream <- *r
         }
     }
     return ok
@@ -82,18 +89,18 @@ func (d Dispatcher) Print () {
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////// helpers
 
-func contains (array *[]chan reading.Reading, value chan reading.Reading) bool {
+func contains (array *[] DispatchEntry, value chan reading.Reading) bool {
     for _, current := range *array {
-        if current==value {
+        if current.stream==value {
             return true
         }
     }
     return false
 }
 
-func locate (array *[]chan reading.Reading, value chan reading.Reading) (int, bool) {
+func locate (array *[] DispatchEntry, value chan reading.Reading) (int, bool) {
     for i:=0 ; i<len(*array) ; i++ {
-        if (*array)[i] == value {
+        if (*array)[i].stream == value {
             return i, true
         }
     }
