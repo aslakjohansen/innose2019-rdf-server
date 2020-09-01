@@ -4,6 +4,7 @@ import (
     "os"
     "fmt"
     
+    "innose2019-rdf-server/config"
     "innose2019-rdf-server/logic"
     "innose2019-rdf-server/transport"
     "innose2019-rdf-server/data/live/mqtt"
@@ -28,6 +29,8 @@ func main () {
     var port  string = os.Args[2]
         model_dir    = os.Args[3]
         ontology_dir = os.Args[4]
+    
+    config.Load("../etc/default_config.json")
     
     logic.Init(model_dir, ontology_dir)
     transport.Init(iface, port, &model_dir)
