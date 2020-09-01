@@ -6,6 +6,7 @@ import (
     
     "innose2019-rdf-server/logic"
     "innose2019-rdf-server/transport"
+    "innose2019-rdf-server/data/live/mqtt"
 )
 
 var (
@@ -30,6 +31,7 @@ func main () {
     
     logic.Init(model_dir, ontology_dir)
     transport.Init(iface, port, &model_dir)
+    mqtt.Init()
     
     select{} // block forever
     
