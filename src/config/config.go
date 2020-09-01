@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-    Modules []ModuleConfig `json:"modules"`
+    Modules []json.RawMessage `json:"modules"`
 }
 
 type ModuleConfig struct {
@@ -30,8 +30,16 @@ func Load (filename string) *Config {
         fmt.Println("Unable to unmarshal config file:", err)
     }
     
-    for _, moduleconf := range config.Modules {
-        fmt.Println("Found config for module", moduleconf.Type)
+    for i, rawmoduleconf := range config.Modules {
+        var moduleconfig ModuleConfig
+        
+        err = json.Unmarshal(rawmoduleconf, &moduleconfig)
+        if err!=nil {
+            fmt.Println("Unable to unmarshal module config", i, ":", err)
+        }
+        
+        
+        fmt.Println("Found config for module", moduleconfig.Type)
     }
     
     return &config
