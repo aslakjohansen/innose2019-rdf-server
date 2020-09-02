@@ -4,8 +4,6 @@ import (
     "fmt"
     "io/ioutil"
     "encoding/json"
-    
-    "innose2019-rdf-server/logic"
 )
 
 type Config struct {
@@ -15,16 +13,12 @@ type Config struct {
 type ModuleConfig struct {
     Type string `json:"type"`
 }
-type ConfigHander func(x string)
-
-var lut map[string]ConfigHander = map[string]ConfigHander {
-    "logic": logic.Load,
-}
+type ConfigHander func(x *json.RawMessage)
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////// interface functions
 
-func Load (filename string) *Config {
+func Load (lut map[string]ConfigHander, filename string) *Config {
     var config Config
     
     data, err := ioutil.ReadFile(filename)
@@ -46,9 +40,9 @@ func Load (filename string) *Config {
         }
         
         fmt.Println("Found config for module", moduleconfig.Type)
-        handler, ok := lut[rawmoduleconfig.Type]
+        handler, ok := lut[moduleconfig.Type]
         if ok {
-            handler(rawmoduleconf)
+            handler(&rawmoduleconf)
         } else {
             fmt.Println("Unable to look up handler for module", moduleconfig.Type)
         }

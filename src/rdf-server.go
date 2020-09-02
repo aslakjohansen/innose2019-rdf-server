@@ -15,6 +15,10 @@ var (
     ontology_dir string = "../var/ontologies"
 )
 
+var config_lut map[string]config.ConfigHander = map[string]config.ConfigHander {
+    "logic": logic.Init,
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////// main
 
@@ -30,9 +34,9 @@ func main () {
         model_dir    = os.Args[3]
         ontology_dir = os.Args[4]
     
-    config.Load("../etc/default_config.json")
+    config.Load(config_lut, "../etc/default_config.json")
     
-    logic.Init(model_dir, ontology_dir)
+//    logic.Init(model_dir, ontology_dir)
     transport.Init(iface, port, &model_dir)
     mqtt.Init()
     

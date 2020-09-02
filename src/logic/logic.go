@@ -24,7 +24,7 @@ var (
 
 type LogicModuleConfig struct {
     config.ModuleConfig
-    ModelDir string `json:"modeldir"`
+    ModelDir    string `json:"modeldir"`
     OntologyDir string `json:"ontologydir"`
 }
 
@@ -32,18 +32,19 @@ type LogicModuleConfig struct {
 ////////////////////////////////////////////////////////// lifecycle management
 
 //func Init (model_dir string, ontology_dir string) {
-func Init (configstring string) {
+func Init (configraw *json.RawMessage) {
     var config LogicModuleConfig
     
     // parse config
-    err = json.Unmarshal(configstring, &config)
+    err := json.Unmarshal(*configraw, &config)
     if err!=nil {
         fmt.Println("Unable to unmarshal config for module 'logic':", err)
     }
+    fmt.Println("loaded ", config)
     
     runtime.LockOSThread() // stick go routine to thread
     
-    err := python.Initialize()
+    err = python.Initialize()
     if err != nil {
         fmt.Println("Unable to initialize python", err)
     }

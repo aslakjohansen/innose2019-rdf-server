@@ -1,7 +1,9 @@
 {
     "modules": [
         {
-            "type": "logic"
+            "type": "logic",
+            "modeldir": "../var/model",
+            "ontologydir": "../var/ontologies"
         }
     ]
 }
