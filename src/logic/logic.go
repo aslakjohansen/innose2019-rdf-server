@@ -4,7 +4,11 @@ import (
     "runtime"
     "fmt"
     "sync"
+    "encoding/json"
+    
     python "github.com/sbinet/go-python"
+    
+    "innose2019-rdf-server/config"
 )
 
 var (
@@ -18,10 +22,25 @@ var (
     mutex sync.Mutex
 )
 
+type LogicModuleConfig struct {
+    config.ModuleConfig
+    ModelDir string `json:"modeldir"`
+    OntologyDir string `json:"ontologydir"`
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// lifecycle management
 
-func Init (model_dir string, ontology_dir string) {
+//func Init (model_dir string, ontology_dir string) {
+func Init (configstring string) {
+    var config LogicModuleConfig
+    
+    // parse config
+    err = json.Unmarshal(configstring, &config)
+    if err!=nil {
+        fmt.Println("Unable to unmarshal config for module 'logic':", err)
+    }
+    
     runtime.LockOSThread() // stick go routine to thread
     
     err := python.Initialize()
@@ -64,7 +83,7 @@ func Init (model_dir string, ontology_dir string) {
         fmt.Println("Unable to name function 'update' in module '"+module_name+"'")
     }
     
-    load_model(model_dir, ontology_dir)
+    load_model(config.ModelDir, config.OntologyDir)
 }
 
 func Finalize () {
