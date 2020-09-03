@@ -16,7 +16,8 @@ var (
 )
 
 var config_lut map[string]config.ConfigHander = map[string]config.ConfigHander {
-    "logic": logic.Init,
+    "logic":     logic.Init,
+    "transport": transport.Init,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,15 +30,15 @@ func main () {
         fmt.Println("        "+os.Args[0]+" 0.0.0.0 8001 ../var/model ../var/ontologies")
         os.Exit(1)
     }
-    var iface string = os.Args[1]
-    var port  string = os.Args[2]
+//    var iface string = os.Args[1]
+//    var port  string = os.Args[2]
         model_dir    = os.Args[3]
         ontology_dir = os.Args[4]
     
     config.Load(config_lut, "../etc/default_config.json")
     
 //    logic.Init(model_dir, ontology_dir)
-    transport.Init(iface, port, &model_dir)
+//    transport.Init(iface, port, &model_dir)
     mqtt.Init()
     
     select{} // block forever

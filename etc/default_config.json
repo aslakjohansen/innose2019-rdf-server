@@ -4,6 +4,12 @@
             "type": "logic",
             "modeldir": "../var/model",
             "ontologydir": "../var/ontologies"
+        },
+        {
+            "type": "transport",
+            "interface": "0.0.0.0",
+            "port": 8001,
+            "modeldir": "../var/model"
         }
     ]
 }
