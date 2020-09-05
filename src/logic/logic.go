@@ -31,7 +31,6 @@ type LogicModuleConfig struct {
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// lifecycle management
 
-//func Init (model_dir string, ontology_dir string) {
 func Init (configraw *json.RawMessage) {
     var config LogicModuleConfig
     

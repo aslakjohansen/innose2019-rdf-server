@@ -37,8 +37,6 @@ func Init (configraw *json.RawMessage) {
         fmt.Println("Unable to unmarshal config for module 'transport':", err)
     }
     fmt.Println("transport: loaded ", config)
-//func Init (iface string, port string, model_dir_arg *string) {
-//    model_dir    = model_dir_arg
     model_dir = &config.Modeldir
     
     go func () {
@@ -51,7 +49,6 @@ func Init (configraw *json.RawMessage) {
         http.HandleFunc("/websocket" , websocket_handler)
         
         // start listening
-//        var endpoint string = fmt.Sprintf("%s:%s", iface, port)
         var endpoint string = fmt.Sprintf("%s:%d", config.Interface, config.Port)
         fmt.Println(fmt.Sprintf("Listening to %s", endpoint))
         err := http.ListenAndServe(endpoint, nil)
