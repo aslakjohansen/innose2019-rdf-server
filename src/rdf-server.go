@@ -11,8 +11,9 @@ import (
 )
 
 var config_lut map[string]config.ConfigHander = map[string]config.ConfigHander {
-    "logic":     logic.Init,
-    "transport": transport.Init,
+    "logic":          logic.Init,
+    "transport":      transport.Init,
+    "data/live/mqtt": mqtt.Init,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,8 +29,6 @@ func main () {
     var config_filename = os.Args[1]
     
     config.Load(config_lut, config_filename)
-    
-    mqtt.Init()
     
     select{} // block forever
     

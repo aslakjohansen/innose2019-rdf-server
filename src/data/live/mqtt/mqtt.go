@@ -5,22 +5,25 @@ import (
     "time"
     "os"
     "log"
+    "encoding/json"
     
     "github.com/eclipse/paho.mqtt.golang"
     
     "innose2019-rdf-server/data/reading"
     "innose2019-rdf-server/data/dispatch"
+    "innose2019-rdf-server/config"
 )
 
+type MqttModuleConfig struct {
+    config.ModuleConfig
+    ClientID              string `json:"client-d"`
+    Brokers             []string `json:"brokers"`
+    SubscriptionPattern   string `json:"subscription"`
+}
+
 var (
-    client_id   string = "rdf-server"
-    brokers   []string = []string{
-        "tcp://localhost:1883",
-    }
-    sub_pattern string = "#"
-    
-    c mqtt.Client
-    
+    cfg      MqttModuleConfig;
+    c           mqtt.Client
     dispatcher *dispatch.Dispatcher
 )
 
@@ -34,16 +37,23 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
     dispatcher.Dispatch(msg.Topic(), reading)
 }
 
-func Init () {
+func Init (configraw *json.RawMessage) {
+    // parse config
+    err := json.Unmarshal(*configraw, &cfg)
+    if err!=nil {
+        fmt.Println("Unable to unmarshal config for module 'data/live/mqtt':", err)
+    }
+    fmt.Println("loaded ", cfg)
+    
     mqtt.DEBUG = log.New(os.Stdout, "", 0)
     mqtt.ERROR = log.New(os.Stdout, "", 0)
     
     // configure options
     opts := mqtt.NewClientOptions()
-    for _, broker := range brokers {
+    for _, broker := range cfg.Brokers {
         opts.AddBroker(broker)
     }
-    opts.SetClientID(client_id)
+    opts.SetClientID(cfg.ClientID)
     opts.SetKeepAlive(60 * time.Second)
     opts.SetPingTimeout(1 * time.Second)
     
@@ -54,7 +64,7 @@ func Init () {
     }
     
     // subscribe to everything
-    if token := c.Subscribe(sub_pattern, 1, f); token.Wait() && token.Error()!=nil {
+    if token := c.Subscribe(cfg.SubscriptionPattern, 1, f); token.Wait() && token.Error()!=nil {
         fmt.Println("Error: MQTT subscription failed:", token.Error())
     }
     
