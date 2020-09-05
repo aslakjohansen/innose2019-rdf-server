@@ -49,7 +49,6 @@ func Init (configraw *json.RawMessage) {
     if err!=nil {
         fmt.Println("Unable to unmarshal config for module 'data/live/mqtt':", err)
     }
-    fmt.Println("loaded ", cfg)
     
     if cfg.Logging.Debug { mqtt.DEBUG = log.New(os.Stdout, "", 0) }
     if cfg.Logging.Error { mqtt.ERROR = log.New(os.Stdout, "", 0) }

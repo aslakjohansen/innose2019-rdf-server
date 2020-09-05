@@ -36,7 +36,6 @@ func Init (configraw *json.RawMessage) {
     if err!=nil {
         fmt.Println("Unable to unmarshal config for module 'transport':", err)
     }
-    fmt.Println("transport: loaded ", config)
     model_dir = &config.Modeldir
     
     go func () {

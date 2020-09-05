@@ -39,7 +39,6 @@ func Load (lut map[string]ConfigHander, filename string) *Config {
             fmt.Println("Unable to unmarshal module config", i, ":", err)
         }
         
-        fmt.Println("Found config for module", moduleconfig.Type)
         handler, ok := lut[moduleconfig.Type]
         if ok {
             handler(&rawmoduleconf)

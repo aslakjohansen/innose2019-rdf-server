@@ -39,7 +39,6 @@ func Init (configraw *json.RawMessage) {
     if err!=nil {
         fmt.Println("Unable to unmarshal config for module 'logic':", err)
     }
-    fmt.Println("loaded ", config)
     
     runtime.LockOSThread() // stick go routine to thread
     
