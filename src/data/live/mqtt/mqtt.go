@@ -22,7 +22,7 @@ type MqttModuleConfig struct {
 }
 
 var (
-    cfg      MqttModuleConfig;
+    cfg         MqttModuleConfig;
     c           mqtt.Client
     dispatcher *dispatch.Dispatcher
 )
