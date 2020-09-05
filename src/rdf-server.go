@@ -10,11 +10,6 @@ import (
     "innose2019-rdf-server/data/live/mqtt"
 )
 
-var (
-    model_dir    string = "../var/model"
-    ontology_dir string = "../var/ontologies"
-)
-
 var config_lut map[string]config.ConfigHander = map[string]config.ConfigHander {
     "logic":     logic.Init,
     "transport": transport.Init,
@@ -25,15 +20,14 @@ var config_lut map[string]config.ConfigHander = map[string]config.ConfigHander {
 
 func main () {
     // guard: command line arguments
-    if (len(os.Args) != 5) {
-        fmt.Println("Syntax: "+os.Args[0]+" INTERFACE PORT MODEL_DIR ONTOLOGY_DIR")
-        fmt.Println("        "+os.Args[0]+" 0.0.0.0 8001 ../var/model ../var/ontologies")
+    if (len(os.Args) != 2) {
+        fmt.Println("Syntax: "+os.Args[0]+" CONFIG_FILE")
+        fmt.Println("        "+os.Args[0]+" ../etc/default_config.json")
         os.Exit(1)
     }
-        model_dir    = os.Args[3]
-        ontology_dir = os.Args[4]
+    var config_filename = os.Args[1]
     
-    config.Load(config_lut, "../etc/default_config.json")
+    config.Load(config_lut, config_filename)
     
     mqtt.Init()
     

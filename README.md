@@ -139,9 +139,9 @@ rm -r $WORK/b001/
 
 ```shell
 innose2019-rdf-server/src$ ./rdf-server
-Syntax: ./rdf-server INTERFACE PORT MODEL_DIR ONTOLOGY_DIR
-        ./rdf-server 0.0.0.0 8001 ../var/model http://ses.sdk.dk/junk/test#
-innose2019-rdf-server/src$ ./rdf-server 0.0.0.0 8001 ../var/model ../var/ontologies
+Syntax: ./rdf-server CONFIG_FILE
+        ./rdf-server ../etc/default_config.json
+innose2019-rdf-server/src$ ./rdf-server ../etc/default_config.json
 RDFLib Version: 5.0.0
 STATUS: Loading model "../var/model/2.ttl".
 Listening to 0.0.0.0:8001
