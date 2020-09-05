@@ -17,7 +17,11 @@
             "brokers": [
                 "tcp://localhost:1883"
             ],
-            "subscription": "#"
+            "subscription": "#",
+            "logging": {
+                "debug": false,
+                "error": false
+            }
         }
     ]
 }

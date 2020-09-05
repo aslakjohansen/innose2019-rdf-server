@@ -14,11 +14,17 @@ import (
     "innose2019-rdf-server/config"
 )
 
+type LoggingConfig struct {
+    Debug bool `json:"debug"`
+    Error bool `json:"error"`
+}
+
 type MqttModuleConfig struct {
     config.ModuleConfig
-    ClientID              string `json:"client-d"`
-    Brokers             []string `json:"brokers"`
-    SubscriptionPattern   string `json:"subscription"`
+    ClientID              string        `json:"client-d"`
+    Brokers             []string        `json:"brokers"`
+    SubscriptionPattern   string        `json:"subscription"`
+    Logging               LoggingConfig `json:"logging"`
 }
 
 var (
@@ -45,8 +51,8 @@ func Init (configraw *json.RawMessage) {
     }
     fmt.Println("loaded ", cfg)
     
-    mqtt.DEBUG = log.New(os.Stdout, "", 0)
-    mqtt.ERROR = log.New(os.Stdout, "", 0)
+    if cfg.Logging.Debug { mqtt.DEBUG = log.New(os.Stdout, "", 0) }
+    if cfg.Logging.Error { mqtt.ERROR = log.New(os.Stdout, "", 0) }
     
     // configure options
     opts := mqtt.NewClientOptions()
