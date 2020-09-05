@@ -9,6 +9,7 @@ import (
     
     "github.com/gorilla/websocket"
     
+    "innose2019-rdf-server/config"
     "innose2019-rdf-server/logic"
 )
 
@@ -17,11 +18,25 @@ var (
     upgrader          = websocket.Upgrader{}
 )
 
+type TransportModuleConfig struct {
+    config.ModuleConfig
+    Interface string `json:"interface"`
+    Port      int    `json:"port"`
+    Modeldir  string `json:"modeldir"`
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// lifecycle management
 
-func Init (iface string, port string, model_dir_arg *string) {
-    model_dir    = model_dir_arg
+func Init (configraw *json.RawMessage) {
+    var config TransportModuleConfig
+    
+    // parse config
+    err := json.Unmarshal(*configraw, &config)
+    if err!=nil {
+        fmt.Println("Unable to unmarshal config for module 'transport':", err)
+    }
+    model_dir = &config.Modeldir
     
     go func () {
         http.HandleFunc("/time"      , time_handler)
@@ -33,7 +48,7 @@ func Init (iface string, port string, model_dir_arg *string) {
         http.HandleFunc("/websocket" , websocket_handler)
         
         // start listening
-        var endpoint string = fmt.Sprintf("%s:%s", iface, port)
+        var endpoint string = fmt.Sprintf("%s:%d", config.Interface, config.Port)
         fmt.Println(fmt.Sprintf("Listening to %s", endpoint))
         err := http.ListenAndServe(endpoint, nil)
         if err != nil {

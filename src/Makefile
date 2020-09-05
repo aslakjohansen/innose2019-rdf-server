@@ -5,7 +5,7 @@ TARGETS = \
 
 
 all: ${TARGETS} ../var/model
-	PYTHONPATH=. ./rdf-server 0.0.0.0 8001 ../var/model ../var/ontologies
+	PYTHONPATH=. ./rdf-server ../etc/default_config.json
 
 clean:
 	touch ${TARGETS}

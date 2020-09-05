@@ -1,0 +1,27 @@
+{
+    "modules": [
+        {
+            "type": "logic",
+            "modeldir": "../var/model",
+            "ontologydir": "../var/ontologies"
+        },
+        {
+            "type": "transport",
+            "interface": "0.0.0.0",
+            "port": 8001,
+            "modeldir": "../var/model"
+        },
+        {
+            "type": "data/live/mqtt",
+            "client-id": "rdf-server",
+            "brokers": [
+                "tcp://localhost:1883"
+            ],
+            "subscription": "#",
+            "logging": {
+                "debug": false,
+                "error": false
+            }
+        }
+    ]
+}
