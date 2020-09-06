@@ -5,6 +5,7 @@ import (
     "encoding/json"
     
     "innose2019-rdf-server/logic"
+    "innose2019-rdf-server/session"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,88 +22,88 @@ type Entry struct {
 type TimeEntry struct {
     Entry
 }
-func (e *TimeEntry) Handle (response_channel chan []byte) {
+func (e *TimeEntry) Handle (s *session.Session) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
     response += fmt.Sprintf("    \"response\": %s\n", logic.JsonTime("    "))
     response += fmt.Sprintf("}\n")
     
-    response_channel <- []byte(response)
+    s.ResponseChannel <- []byte(response)
 }
 
 type StoreEntry struct {
     Entry
 }
-func (e *StoreEntry) Handle (response_channel chan []byte) {
+func (e *StoreEntry) Handle (s *session.Session) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
     response += fmt.Sprintf("    \"response\": %s\n", logic.JsonStore("    ", model_dir))
     response += fmt.Sprintf("}\n")
     
-    response_channel <- []byte(response)
+    s.ResponseChannel <- []byte(response)
 }
 
 type NamespacesEntry struct {
     Entry
 }
-func (e *NamespacesEntry) Handle (response_channel chan []byte) {
+func (e *NamespacesEntry) Handle (s *session.Session) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
     response += fmt.Sprintf("    \"response\": %s\n", logic.JsonNamespaces("    "))
     response += fmt.Sprintf("}\n")
     
-    response_channel <- []byte(response)
+    s.ResponseChannel <- []byte(response)
 }
 
 type QueryEntry struct {
     Entry
     Query string `json:"query"`
 }
-func (e *QueryEntry) Handle (response_channel chan []byte) {
+func (e *QueryEntry) Handle (s *session.Session) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
     response += fmt.Sprintf("    \"response\": %s\n", logic.JsonQuery("    ", e.Query))
     response += fmt.Sprintf("}\n")
     
-    response_channel <- []byte(response)
+    s.ResponseChannel <- []byte(response)
 }
 
 type UpdateEntry struct {
     Entry
     Query string `json:"query"`
 }
-func (e *UpdateEntry) Handle (response_channel chan []byte) {
+func (e *UpdateEntry) Handle (s *session.Session) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
     response += fmt.Sprintf("    \"response\": %s\n", logic.JsonUpdate("    ", e.Query))
     response += fmt.Sprintf("}\n")
     
-    response_channel <- []byte(response)
+    s.ResponseChannel <- []byte(response)
 }
 
 type InspectEntry struct {
     Entry
     Query string `json:"query"`
 }
-func (e *InspectEntry) Handle (response_channel chan []byte) {
+func (e *InspectEntry) Handle (s *session.Session) {
     var response string = ""
     response += fmt.Sprintf("{\n")
     response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
     response += fmt.Sprintf("    \"response\": %s\n", logic.JsonInspect("    ", e.Query))
     response += fmt.Sprintf("}\n")
     
-    response_channel <- []byte(response)
+    s.ResponseChannel <- []byte(response)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////// main dispatcher
 
-func Dispatch (input []byte, response_channel chan []byte) {
+func Dispatch (input []byte, s *session.Session) {
     var entry Entry
     err := json.Unmarshal(input, &entry)
     if err!=nil {
@@ -118,7 +119,7 @@ func Dispatch (input []byte, response_channel chan []byte) {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
             return
         }
-        typed_entry.Handle(response_channel)
+        typed_entry.Handle(s)
     case "store":
         var typed_entry StoreEntry
         err := json.Unmarshal(input, &typed_entry)
@@ -126,7 +127,7 @@ func Dispatch (input []byte, response_channel chan []byte) {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
             return
         }
-        typed_entry.Handle(response_channel)
+        typed_entry.Handle(s)
     case "namespaces":
         var typed_entry NamespacesEntry
         err := json.Unmarshal(input, &typed_entry)
@@ -134,7 +135,7 @@ func Dispatch (input []byte, response_channel chan []byte) {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
             return
         }
-        typed_entry.Handle(response_channel)
+        typed_entry.Handle(s)
     case "query":
         var typed_entry QueryEntry
         err := json.Unmarshal(input, &typed_entry)
@@ -142,7 +143,7 @@ func Dispatch (input []byte, response_channel chan []byte) {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
             return
         }
-        typed_entry.Handle(response_channel)
+        typed_entry.Handle(s)
     case "update":
         var typed_entry UpdateEntry
         err := json.Unmarshal(input, &typed_entry)
@@ -150,7 +151,7 @@ func Dispatch (input []byte, response_channel chan []byte) {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
             return
         }
-        typed_entry.Handle(response_channel)
+        typed_entry.Handle(s)
     case "inspect":
         var typed_entry InspectEntry
         err := json.Unmarshal(input, &typed_entry)
@@ -158,6 +159,6 @@ func Dispatch (input []byte, response_channel chan []byte) {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
             return
         }
-        typed_entry.Handle(response_channel)
+        typed_entry.Handle(s)
     }
 }

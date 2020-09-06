@@ -11,6 +11,7 @@ import (
     
     "innose2019-rdf-server/config"
     "innose2019-rdf-server/logic"
+    "innose2019-rdf-server/session"
 )
 
 var (
@@ -177,6 +178,7 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     enter(&refcount, mux)
     
     // enter service loop
+    var s *session.Session = session.NewSession(response_channel)
     for {
         // receive
         _, message, err := ws.ReadMessage()
@@ -191,7 +193,7 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
         // send off to processing
         enter(&refcount, mux)
         go func() {
-            Dispatch(message, response_channel)
+            Dispatch(message, s)
             leave(&refcount, mux, response_channel)
         }()
     }
