@@ -1,6 +1,7 @@
 TARGETS = \
 	parse-sparql \
 	data-dispatch-registration \
+	subscription \
 
 
 all: ${TARGETS}
@@ -17,4 +18,7 @@ parse-sparql: parse-sparql.go ../src/sparql/y.go
 
 data-dispatch-registration: data-dispatch-registration.go
 	go run data-dispatch-registration.go
+
+subscription: subscription.go
+	go run subscription.go
 
