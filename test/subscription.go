@@ -14,12 +14,11 @@ func main () {
         var identifier string = fmt.Sprintf("identifier%d", i)
         var response_channel chan []byte = make(chan []byte)
         var sub = subscription.NewSubscription(response_channel)
+        
         s.AddSubscription(identifier, sub)
         
         fmt.Println(s);
         fmt.Println("")
     }
-    
-    
 }
 
