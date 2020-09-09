@@ -100,6 +100,21 @@ func (e *InspectEntry) Handle (s *session.Session) {
     s.ResponseChannel <- []byte(response)
 }
 
+type SubscribeEntry struct {
+    Entry
+    Query string `json:"query"`
+}
+func (e *SubscribeEntry) Handle (s *session.Session) {
+    
+    var response string = ""
+    response += fmt.Sprintf("{\n")
+    response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
+    response += fmt.Sprintf("    \"response\": \"%s\"\n", "subscribed")
+    response += fmt.Sprintf("}\n")
+    
+    s.ResponseChannel <- []byte(response)
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////// main dispatcher
 
@@ -154,6 +169,14 @@ func Dispatch (input []byte, s *session.Session) {
         typed_entry.Handle(s)
     case "inspect":
         var typed_entry InspectEntry
+        err := json.Unmarshal(input, &typed_entry)
+        if err!=nil {
+            fmt.Println("Error: Unable to do second parsing of ws message:", string(input))
+            return
+        }
+        typed_entry.Handle(s)
+    case "subscribe":
+        var typed_entry SubscribeEntry
         err := json.Unmarshal(input, &typed_entry)
         if err!=nil {
             fmt.Println("Error: Unable to do second parsing of ws message:", string(input))

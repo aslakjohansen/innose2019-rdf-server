@@ -7,22 +7,24 @@ import (
 )
 
 type Session struct {
+    ResponseChannel chan []byte
     Subscriptions   map[string](*subscription.Subscription)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////// interface functions
 
-func NewSession () *Session {
+func NewSession (response_channel chan []byte) *Session {
     var s Session
     
-    s.Subscriptions = make(map[string](*subscription.Subscription))
+    s.ResponseChannel = response_channel
+    s.Subscriptions   = make(map[string](*subscription.Subscription))
     
     return &s
 }
 
 func (s *Session) Destroy () {
-//    close(s.ResponseChannel)
+    close(s.ResponseChannel)
 }
 
 func (s *Session) AddSubscription (identifier string, sub *subscription.Subscription) {
