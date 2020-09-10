@@ -39,6 +39,16 @@ func (s *Session) RemoveSubscription (identifier string) {
     }
 }
 
+func (s *Session) GetSubscriptionIdentifiers () []string {
+    var result []string = make([]string, 0)
+    
+    for key, _ := range s.Subscriptions {
+        result = append(result, key)
+    }
+    
+    return result;
+}
+
 func (s *Session) String () string {
     var result string = ""
     

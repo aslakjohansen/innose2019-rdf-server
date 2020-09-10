@@ -1748,3 +1748,47 @@ Dispatcher
  - b: 2 entries
 ```
 
+### Subscription Management
+
+```shell
+aslak@thera:~/vcs/git/innose2019-rdf-server/src$ ./rdf-client 127.0.0.1 8001
+Connecting to ws://127.0.0.1:8001/websocket
+>> {"command": "subscribe", "id": "2", "query": "SELECT ?obj WHERE {brick:Sensor rdfs:subClassOf ?obj .}"}
+{
+    "id": "2",
+    "response": "subscribed"
+}
+>> {"command": "subscribe", "id": "3", "query": "SELECT ?obj WHERE {brick:Sensor rdfs:subClassOf ?obj .}"}
+{
+    "id": "3",
+    "response": "subscribed"
+}
+>> {"command": "subscribe", "id": "4", "query": "SELECT ?obj WHERE {brick:Sensor rdfs:subClassOf ?obj .}"}
+{
+    "id": "4",
+    "response": "subscribed"
+}
+>> {"command": "subscriptions", "id": "5"}
+{
+    "id": "5",
+    "subscriptions": [
+    "4",
+    "2",
+    "3"
+    ]
+}
+>> {"command": "unsubscribe", "id": "6", "subscription": "3"}
+{
+    "id": "6",
+    "response": "unsubscribed"
+}
+>> {"command": "subscriptions", "id": "7"}
+{
+    "id": "7",
+    "subscriptions": [
+    "4",
+    "2"
+    ]
+}
+>> 
+```
