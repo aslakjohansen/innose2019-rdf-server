@@ -2,6 +2,24 @@
 
 This server is a [Go](https://golang.org) program that wraps some [Python](https://www.python.org) code for access to [rdflib](https://rdflib.readthedocs.io).
 
+Index:
+- [Requirements](#requirements)
+- [Building](#building)
+- [Running](#running)
+- [Interface](#interface)
+    - [Fetch time from server](#fetch-time-from-server)
+    - [Store model to disk](#store-model-to-disk)
+    - [Fetch the current namespace mapping](#fetch-the-current-namespace-mapping)
+    - [Resolving a query](#resolving-a-query)
+    - [Perform an update](#perform-an-update)
+    - [Inspect a query](#inspect-a-query)
+    - [Send valid data over MQTT](#send-valid-data-over-mqtt)
+    - [Send invalid data over MQTT](#send-invalid-data-over-mqtt)
+- [Testing](#testing)
+    - [SparQL Parsing](#sparql-parsing)
+    - [Data Dispatching](#data-dispatching)
+    - [Subscription Management](#subscription-management)
+
 ## Requirements
 
 - The `python2.7-dev` package (as it is a dependency for go-python)
@@ -164,7 +182,7 @@ $ curl -X PUT -d '42' http://localhost:8001/time
 
 **Note:** The `42` payload is not used, but the payload needs to be valid json.
 
-### Fetch store model to disk
+### Store model to disk
 
 ```shell
 $ curl -X PUT -d '42' http://localhost:8001/store
@@ -861,7 +879,7 @@ $ curl -X PUT -d '"SELECT ?pred ?obj WHERE {brick:Sensor ?pred ?obj .}"' http://
 
 ```
 
-### Performing an update
+### Perform an update
 
 ```shell
 $ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n\nDELETE { brick:Sensor rdfs:subClassOf ?obj .} WHERE {brick:Sensor rdfs:subClassOf ?obj .}"' http://localhost:8001/update
@@ -875,7 +893,7 @@ $ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n
 - a where clause must exist
 - no slashes in entity names
 
-### Inspecting a query
+### Inspect a query
 
 ```shell
 $ curl -X PUT -d '"! SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhost:8001/inspect
