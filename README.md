@@ -27,7 +27,7 @@ Index:
   - `rdflib` (both 4.2.2 and 5.0.0 have been tested)
   - `requests` (for some reason rdflib makes use of it without depending on it)
 
-For testin:
+For testing:
 - `mosquitto-clients` (manual MQTT publication)
 
 ## Building
