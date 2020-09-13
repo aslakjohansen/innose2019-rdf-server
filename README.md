@@ -192,6 +192,8 @@ $ curl -X PUT -d '42' http://localhost:8001/store
 }
 ```
 
+**Note:** The `42` payload is not used, but the payload needs to be valid json.
+
 ### Fetch the current namespace mapping
 
 ```shell
@@ -214,6 +216,8 @@ $ curl -X PUT -d '42' http://localhost:8001/namespaces
     "success": true
 }
 ```
+
+**Note:** The `42` payload is not used, but the payload needs to be valid json.
 
 ### Resolving a query
 
