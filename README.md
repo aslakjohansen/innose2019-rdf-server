@@ -937,6 +937,8 @@ $ curl -X PUT -d '"SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhos
 
 **Note:** This may provide useful insights while debugging.
 
+## Testing
+
 ### Send valid data over MQTT
 
 ```shell
@@ -948,8 +950,6 @@ $ mosquitto_pub -t "test" -m "{\"time\": 1234.5678, \"value\": 42.56}"
 ```shell
 $ mosquitto_pub -t "test" -m "blah"
 ```
-
-## Testing
 
 ### SparQL Parsing
 
