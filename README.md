@@ -5,6 +5,7 @@ This server is a [Go](https://golang.org) program that wraps some [Python](https
 Index:
 - [Requirements](#requirements)
 - [Building](doc/building.md)
+- [Interface](doc/interface.md)
 - [Running](doc/running.md)
 - [Testing](doc/testing.md)
 
