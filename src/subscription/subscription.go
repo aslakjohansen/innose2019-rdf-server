@@ -10,7 +10,7 @@ import (
 
 var (
     dispatch_mux sync.Mutex
-    dispatch map[string](*DispatchEntry)
+    dispatch map[string](*DispatchEntry) = make(map[string](*DispatchEntry))
 )
 
 // type ResultSet ([][]string)
@@ -21,8 +21,10 @@ type DispatchEntry struct {
 }
 
 type ResultDiff struct {
-    Plus  *([][]string) `json:"+"`
-    Minus *([][]string) `json:"-"`
+    // Plus  *([][]string) `json:"+"`
+    // Minus *([][]string) `json:"-"`
+    Plus  [][]string `json:"+"`
+    Minus [][]string `json:"-"`
 }
 
 type Subscription struct {
@@ -47,7 +49,7 @@ func (r *ResultDiff) Transmit (channel chan []byte, id string) {
     response += fmt.Sprintf("  \"type\": \"resultset\"\n")
     response += fmt.Sprintf("  \"id\": \"%s\"\n", id)
     response += fmt.Sprintf("  \"+\": [\n")
-    for i, row := range *r.Plus {
+    for i, row := range r.Plus {
         response += fmt.Sprintf("    [\n")
         for j, cell := range row {
             response += fmt.Sprintf("      \"%s\"", cell)
@@ -57,14 +59,14 @@ func (r *ResultDiff) Transmit (channel chan []byte, id string) {
             response += fmt.Sprintf("\n")
         }
         response += fmt.Sprintf("    ]")
-        if i!=len(*r.Plus)-1 {
+        if i!=len(r.Plus)-1 {
             response += fmt.Sprintf(",")
         }
         response += fmt.Sprintf("\n")
     }
     response += fmt.Sprintf("  ],\n")
     response += fmt.Sprintf("  \"-\": [\n")
-    for i, row := range *r.Minus {
+    for i, row := range r.Minus {
         response += fmt.Sprintf("    [\n")
         for j, cell := range row {
             response += fmt.Sprintf("      \"%s\"", cell)
@@ -74,7 +76,7 @@ func (r *ResultDiff) Transmit (channel chan []byte, id string) {
             response += fmt.Sprintf("\n")
         }
         response += fmt.Sprintf("    ]")
-        if i!=len(*r.Minus)-1 {
+        if i!=len(r.Minus)-1 {
             response += fmt.Sprintf(",")
         }
         response += fmt.Sprintf("\n")
@@ -111,8 +113,7 @@ func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
             }
         }
         if !found_row {
-            tmp := append(*result.Minus, rowa)
-            result.Minus = &tmp
+            result.Minus = append(result.Minus, rowa)
         }
     }
     
@@ -134,8 +135,7 @@ func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
             }
         }
         if !found_row {
-            tmp := append(*result.Plus, rowb)
-            result.Plus = &tmp
+            result.Plus = append(result.Plus, rowb)
         }
     }
     
@@ -243,7 +243,7 @@ func (s *Subscription) Push () {
     }
     
     var result *ResultDiff = NewResultDiff()
-    result.Plus = de.Cache
+    result.Plus = *de.Cache
     result.Transmit(s.ResponseChannel, s.id)
 }
 
