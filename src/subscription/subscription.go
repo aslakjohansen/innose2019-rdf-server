@@ -4,7 +4,6 @@ import (
     "fmt"
     "sync"
     
-    // "innose2019-rdf-server/sparql"
     "innose2019-rdf-server/logic"
 )
 
@@ -21,8 +20,6 @@ type DispatchEntry struct {
 }
 
 type ResultDiff struct {
-    // Plus  *([][]string) `json:"+"`
-    // Minus *([][]string) `json:"-"`
     Plus  [][]string `json:"+"`
     Minus [][]string `json:"-"`
 }
@@ -90,12 +87,11 @@ func (r *ResultDiff) Transmit (channel chan []byte, id string) {
 func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
     var result ResultDiff
     var found_row bool
-    resultset_print(a)
-    fmt.Println("")
-    resultset_print(b)
-    fmt.Println("subscription.resultset_diff");
+    // resultset_print(a)
+    // fmt.Println("")
+    // resultset_print(b)
+    // fmt.Println("subscription.resultset_diff");
     
-    // TODO: will this work?
     result.Plus  = nil
     result.Minus = nil
     
@@ -117,7 +113,7 @@ func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
             }
         }
         if !found_row {
-            fmt.Println("  minus added")
+            // fmt.Println("  minus added")
             result.Minus = append(result.Minus, rowa)
         }
     }
@@ -140,7 +136,7 @@ func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
             }
         }
         if !found_row {
-            fmt.Println("  plus added")
+            // fmt.Println("  plus added")
             result.Plus = append(result.Plus, rowb)
         }
     }
