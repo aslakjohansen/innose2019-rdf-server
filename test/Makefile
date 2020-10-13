@@ -2,6 +2,7 @@ TARGETS = \
 	parse-sparql \
 	data-dispatch-registration \
 	subscription \
+	subscription-interface \
 
 
 all: ${TARGETS}
@@ -21,4 +22,7 @@ data-dispatch-registration: data-dispatch-registration.go
 
 subscription: subscription.go
 	go run subscription.go
+
+subscription-interface: subscription-interface.go
+	go run subscription-interface.go
 

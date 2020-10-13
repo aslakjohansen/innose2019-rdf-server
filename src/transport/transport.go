@@ -211,7 +211,7 @@ func leave (refcount *int64, mux sync.Mutex, response_channel chan []byte) {
     mux.Unlock()
     
     if *refcount==0 {
-        close(response_channel)
+        close(response_channel) // TODO: this fails when the client dies
     }
 }
 

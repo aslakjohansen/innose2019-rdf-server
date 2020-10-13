@@ -46,8 +46,8 @@ func NewResultDiff () *ResultDiff {
 func (r *ResultDiff) Transmit (channel chan []byte, id string) {
     var response string = ""
     response += fmt.Sprintf("{\n")
-    response += fmt.Sprintf("  \"type\": \"resultset\"\n")
-    response += fmt.Sprintf("  \"id\": \"%s\"\n", id)
+    response += fmt.Sprintf("  \"type\": \"resultset\",\n")
+    response += fmt.Sprintf("  \"id\": \"%s\",\n", id)
     response += fmt.Sprintf("  \"+\": [\n")
     for i, row := range r.Plus {
         response += fmt.Sprintf("    [\n")
@@ -90,6 +90,10 @@ func (r *ResultDiff) Transmit (channel chan []byte, id string) {
 func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
     var result ResultDiff
     var found_row bool
+    resultset_print(a)
+    fmt.Println("")
+    resultset_print(b)
+    fmt.Println("subscription.resultset_diff");
     
     // TODO: will this work?
     result.Plus  = nil
@@ -113,14 +117,15 @@ func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
             }
         }
         if !found_row {
+            fmt.Println("  minus added")
             result.Minus = append(result.Minus, rowa)
         }
     }
     
     // fill out plus
-    for _, rowb := range *a {
+    for _, rowb := range *b {
         found_row = false
-        for _, rowa := range *b {
+        for _, rowa := range *a {
             var match bool = true
             for i, elemb := range rowb {
                 elema := rowa[i]
@@ -135,11 +140,21 @@ func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
             }
         }
         if !found_row {
+            fmt.Println("  plus added")
             result.Plus = append(result.Plus, rowb)
         }
     }
     
     return &result
+}
+
+func resultset_print (data *[][]string) {
+    for _, row := range *data {
+        for _, cell := range row {
+            fmt.Print("["+cell+"]")
+        }
+        fmt.Println("")
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,6 +173,7 @@ func NewDispatchEntry () *DispatchEntry {
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////// interface functions
 
+// TODO: mutex around?
 func Update () {
     for query, de := range dispatch {
         var result  [][]string
@@ -175,6 +191,8 @@ func Update () {
         for _, subscription := range *de.Subscriptions {
             diff.Transmit(subscription.ResponseChannel, subscription.id)
         }
+        
+        de.Cache = &result
     }
 }
 
