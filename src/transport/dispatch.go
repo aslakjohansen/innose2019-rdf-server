@@ -50,13 +50,6 @@ type TimeEntry struct {
 }
 func (e *TimeEntry) Handle (s *session.Session) {
     send_response(s.ResponseChannel, e.Identifier, logic.JsonTime("    "))
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    // response += fmt.Sprintf("    \"response\": %s\n", logic.JsonTime("    "))
-    // response += fmt.Sprintf("}\n")
-    
-    // s.ResponseChannel <- []byte(response)
 }
 
 type StoreEntry struct {
@@ -64,13 +57,6 @@ type StoreEntry struct {
 }
 func (e *StoreEntry) Handle (s *session.Session) {
     send_response(s.ResponseChannel, e.Identifier, logic.JsonStore("    ", model_dir))
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    // response += fmt.Sprintf("    \"response\": %s\n", logic.JsonStore("    ", model_dir))
-    // response += fmt.Sprintf("}\n")
-    
-    // s.ResponseChannel <- []byte(response)
 }
 
 type NamespacesEntry struct {
@@ -78,13 +64,6 @@ type NamespacesEntry struct {
 }
 func (e *NamespacesEntry) Handle (s *session.Session) {
     send_response(s.ResponseChannel, e.Identifier, logic.JsonNamespaces("    "))
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    // response += fmt.Sprintf("    \"response\": %s\n", logic.JsonNamespaces("    "))
-    // response += fmt.Sprintf("}\n")
-    
-    // s.ResponseChannel <- []byte(response)
 }
 
 type QueryEntry struct {
@@ -93,13 +72,6 @@ type QueryEntry struct {
 }
 func (e *QueryEntry) Handle (s *session.Session) {
     send_response(s.ResponseChannel, e.Identifier, logic.JsonQuery("    ", e.Query))
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    // response += fmt.Sprintf("    \"response\": %s\n", logic.JsonQuery("    ", e.Query))
-    // response += fmt.Sprintf("}\n")
-    
-    // s.ResponseChannel <- []byte(response)
 }
 
 type UpdateEntry struct {
@@ -110,15 +82,6 @@ func (e *UpdateEntry) Handle (s *session.Session) {
     var response string = logic.JsonUpdate("    ", e.Query)
     subscription.Update()
     send_response(s.ResponseChannel, e.Identifier, response)
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    // response += fmt.Sprintf("    \"response\": %s\n", logic.JsonUpdate("    ", e.Query))
-    // response += fmt.Sprintf("}\n")
-    
-    // subscription.Update()
-    
-    // s.ResponseChannel <- []byte(response)
 }
 
 type InspectEntry struct {
@@ -127,13 +90,6 @@ type InspectEntry struct {
 }
 func (e *InspectEntry) Handle (s *session.Session) {
     send_response(s.ResponseChannel, e.Identifier, logic.JsonInspect("    ", e.Query))
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    // response += fmt.Sprintf("    \"response\": %s\n", logic.JsonInspect("    ", e.Query))
-    // response += fmt.Sprintf("}\n")
-    
-    // s.ResponseChannel <- []byte(response)
 }
 
 type SubscribeEntry struct {
@@ -167,14 +123,6 @@ func (e *SubscribeEntry) Handle (s *session.Session) {
     send_response(s.ResponseChannel, e.Identifier, "subscribed")
     
     sub.Push()
-    
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    // response += fmt.Sprintf("    \"response\": \"%s\"\n", "subscribed")
-    // response += fmt.Sprintf("}\n")
-    
-    // s.ResponseChannel <- []byte(response)
 }
 
 type UnsubscribeEntry struct {
@@ -184,15 +132,6 @@ type UnsubscribeEntry struct {
 func (e *UnsubscribeEntry) Handle (s *session.Session) {
     subscription.Unsubscribe(e.Identifier)
     send_response(s.ResponseChannel, e.Identifier, "unsubscribed")
-    // s.RemoveSubscription(e.Subscription)
-    
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("    \"id\": \"%s\",\n", e.Identifier)
-    // response += fmt.Sprintf("    \"response\": \"%s\"\n", "unsubscribed")
-    // response += fmt.Sprintf("}\n")
-    
-    // s.ResponseChannel <- []byte(response)
 }
 
 type SubscriptionsEntry struct {
