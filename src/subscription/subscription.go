@@ -5,6 +5,7 @@ import (
     "sync"
     
     "innose2019-rdf-server/logic"
+    . "innose2019-rdf-server/message"
 )
 
 var (
@@ -27,7 +28,8 @@ type ResultDiff struct {
 type Subscription struct {
     id              string
     Query           string
-    ResponseChannel chan []byte
+    ResponseChannel chan interface{}
+    // ResponseChannel chan []byte
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,48 +42,51 @@ func NewResultDiff () *ResultDiff {
     return &result
 }
 
-func (r *ResultDiff) Transmit (channel chan []byte, id string) {
-    var response string = ""
-    response += fmt.Sprintf("{\n")
-    response += fmt.Sprintf("  \"type\": \"resultset\",\n")
-    response += fmt.Sprintf("  \"id\": \"%s\",\n", id)
-    response += fmt.Sprintf("  \"+\": [\n")
-    for i, row := range r.Plus {
-        response += fmt.Sprintf("    [\n")
-        for j, cell := range row {
-            response += fmt.Sprintf("      \"%s\"", cell)
-            if j!=len(row)-1 {
-                response += fmt.Sprintf(",")
-            }
-            response += fmt.Sprintf("\n")
-        }
-        response += fmt.Sprintf("    ]")
-        if i!=len(r.Plus)-1 {
-            response += fmt.Sprintf(",")
-        }
-        response += fmt.Sprintf("\n")
-    }
-    response += fmt.Sprintf("  ],\n")
-    response += fmt.Sprintf("  \"-\": [\n")
-    for i, row := range r.Minus {
-        response += fmt.Sprintf("    [\n")
-        for j, cell := range row {
-            response += fmt.Sprintf("      \"%s\"", cell)
-            if j!=len(row)-1 {
-                response += fmt.Sprintf(",")
-            }
-            response += fmt.Sprintf("\n")
-        }
-        response += fmt.Sprintf("    ]")
-        if i!=len(r.Minus)-1 {
-            response += fmt.Sprintf(",")
-        }
-        response += fmt.Sprintf("\n")
-    }
-    response += fmt.Sprintf("  ]\n")
-    response += fmt.Sprintf("}")
+func (r *ResultDiff) Transmit (channel chan interface{}, id string) {
+// func (r *ResultDiff) Transmit (channel chan []byte, id string) {
+    // var response string = ""
+    // response += fmt.Sprintf("{\n")
+    // response += fmt.Sprintf("  \"type\": \"resultset\",\n")
+    // response += fmt.Sprintf("  \"id\": \"%s\",\n", id)
+    // response += fmt.Sprintf("  \"+\": [\n")
+    // for i, row := range r.Plus {
+    //     response += fmt.Sprintf("    [\n")
+    //     for j, cell := range row {
+    //         response += fmt.Sprintf("      \"%s\"", cell)
+    //         if j!=len(row)-1 {
+    //             response += fmt.Sprintf(",")
+    //         }
+    //         response += fmt.Sprintf("\n")
+    //     }
+    //     response += fmt.Sprintf("    ]")
+    //     if i!=len(r.Plus)-1 {
+    //         response += fmt.Sprintf(",")
+    //     }
+    //     response += fmt.Sprintf("\n")
+    // }
+    // response += fmt.Sprintf("  ],\n")
+    // response += fmt.Sprintf("  \"-\": [\n")
+    // for i, row := range r.Minus {
+    //     response += fmt.Sprintf("    [\n")
+    //     for j, cell := range row {
+    //         response += fmt.Sprintf("      \"%s\"", cell)
+    //         if j!=len(row)-1 {
+    //             response += fmt.Sprintf(",")
+    //         }
+    //         response += fmt.Sprintf("\n")
+    //     }
+    //     response += fmt.Sprintf("    ]")
+    //     if i!=len(r.Minus)-1 {
+    //         response += fmt.Sprintf(",")
+    //     }
+    //     response += fmt.Sprintf("\n")
+    // }
+    // response += fmt.Sprintf("  ]\n")
+    // response += fmt.Sprintf("}")
     
-    channel <- []byte(response)
+    // channel <- []byte(response)
+    var response MessageResultSet = MessageResultSet{Message{id, "resultset", true}, r.Plus, r.Minus}
+    channel <- &response
 }
 
 func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
@@ -197,7 +202,8 @@ func Unsubscribe (id string) bool {
     return true
 }
 
-func NewSubscription (id string, query string, response_channel chan []byte) *Subscription {
+func NewSubscription (id string, query string, response_channel chan interface{}) *Subscription {
+// func NewSubscription (id string, query string, response_channel chan []byte) *Subscription {
     var s Subscription
     
     s.id              = id

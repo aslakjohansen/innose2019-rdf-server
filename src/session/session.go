@@ -7,14 +7,14 @@ import (
 )
 
 type Session struct {
-    ResponseChannel chan []byte
+    ResponseChannel chan interface{}
     Subscriptions   map[string](*subscription.Subscription)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////// interface functions
 
-func NewSession (response_channel chan []byte) *Session {
+func NewSession (response_channel chan interface{}) *Session {
     var s Session
     
     s.ResponseChannel = response_channel

@@ -161,10 +161,18 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     defer ws.Close()
     
     // response handling
-    var response_channel chan []byte = make(chan []byte)
+    var response_channel chan interface{} = make(chan interface{})
+    // var response_channel chan []byte = make(chan []byte)
     go func () {
-        for response := range response_channel {
-            err = ws.WriteMessage(websocket.TextMessage, response)
+        // TODO: create a generic Message struct and derivatives, and use json marshaling on this function
+        for pointer := range response_channel {
+            message, err := json.Marshal(pointer)
+            if err!=nil {
+                fmt.Println("Warn: Unable to marshal message for websocket transmision:", err)
+                continue
+            }
+            err = ws.WriteMessage(websocket.TextMessage, message)
+            // err = ws.WriteMessage(websocket.TextMessage, response)
             if err!=nil {
                 fmt.Println("Warn: Unable to send through websocket:", err)
                 return
@@ -186,6 +194,7 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
             if err.Error()!="websocket: close 1000 (normal)" {
                 fmt.Println("Warn: Unable to receive through websocket:", err)
             }
+            // TODO: trigger closing of channel // TODO: done_wg.Done() ; select(empty(response_channel), isdone_wg.Wait()) ; close(response_channel) // implement this in ResponseConduit struct
             leave(&refcount, mux, response_channel)
             return
         }
@@ -205,7 +214,8 @@ func enter (refcount *int64, mux sync.Mutex) {
     mux.Unlock()
 }
 
-func leave (refcount *int64, mux sync.Mutex, response_channel chan []byte) {
+func leave (refcount *int64, mux sync.Mutex, response_channel chan interface{}) {
+// func leave (refcount *int64, mux sync.Mutex, response_channel chan []byte) {
     mux.Lock()
     *refcount--
     mux.Unlock()
