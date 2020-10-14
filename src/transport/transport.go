@@ -162,9 +162,7 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     
     // response handling
     var response_channel chan interface{} = make(chan interface{})
-    // var response_channel chan []byte = make(chan []byte)
     go func () {
-        // TODO: create a generic Message struct and derivatives, and use json marshaling on this function
         for pointer := range response_channel {
             message, err := json.Marshal(pointer)
             if err!=nil {
@@ -172,7 +170,6 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
                 continue
             }
             err = ws.WriteMessage(websocket.TextMessage, message)
-            // err = ws.WriteMessage(websocket.TextMessage, response)
             if err!=nil {
                 fmt.Println("Warn: Unable to send through websocket:", err)
                 return
@@ -215,7 +212,6 @@ func enter (refcount *int64, mux sync.Mutex) {
 }
 
 func leave (refcount *int64, mux sync.Mutex, response_channel chan interface{}) {
-// func leave (refcount *int64, mux sync.Mutex, response_channel chan []byte) {
     mux.Lock()
     *refcount--
     mux.Unlock()

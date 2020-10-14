@@ -29,7 +29,6 @@ type Subscription struct {
     id              string
     Query           string
     ResponseChannel chan interface{}
-    // ResponseChannel chan []byte
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,48 +42,6 @@ func NewResultDiff () *ResultDiff {
 }
 
 func (r *ResultDiff) Transmit (channel chan interface{}, id string) {
-// func (r *ResultDiff) Transmit (channel chan []byte, id string) {
-    // var response string = ""
-    // response += fmt.Sprintf("{\n")
-    // response += fmt.Sprintf("  \"type\": \"resultset\",\n")
-    // response += fmt.Sprintf("  \"id\": \"%s\",\n", id)
-    // response += fmt.Sprintf("  \"+\": [\n")
-    // for i, row := range r.Plus {
-    //     response += fmt.Sprintf("    [\n")
-    //     for j, cell := range row {
-    //         response += fmt.Sprintf("      \"%s\"", cell)
-    //         if j!=len(row)-1 {
-    //             response += fmt.Sprintf(",")
-    //         }
-    //         response += fmt.Sprintf("\n")
-    //     }
-    //     response += fmt.Sprintf("    ]")
-    //     if i!=len(r.Plus)-1 {
-    //         response += fmt.Sprintf(",")
-    //     }
-    //     response += fmt.Sprintf("\n")
-    // }
-    // response += fmt.Sprintf("  ],\n")
-    // response += fmt.Sprintf("  \"-\": [\n")
-    // for i, row := range r.Minus {
-    //     response += fmt.Sprintf("    [\n")
-    //     for j, cell := range row {
-    //         response += fmt.Sprintf("      \"%s\"", cell)
-    //         if j!=len(row)-1 {
-    //             response += fmt.Sprintf(",")
-    //         }
-    //         response += fmt.Sprintf("\n")
-    //     }
-    //     response += fmt.Sprintf("    ]")
-    //     if i!=len(r.Minus)-1 {
-    //         response += fmt.Sprintf(",")
-    //     }
-    //     response += fmt.Sprintf("\n")
-    // }
-    // response += fmt.Sprintf("  ]\n")
-    // response += fmt.Sprintf("}")
-    
-    // channel <- []byte(response)
     var response MessageResultSet = MessageResultSet{Message{id, "resultset", true}, r.Plus, r.Minus}
     channel <- &response
 }
