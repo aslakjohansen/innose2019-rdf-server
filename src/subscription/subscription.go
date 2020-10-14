@@ -6,6 +6,7 @@ import (
     
     "innose2019-rdf-server/logic"
     . "innose2019-rdf-server/message"
+    . "innose2019-rdf-server/responseconduit"
 )
 
 var (
@@ -26,9 +27,10 @@ type ResultDiff struct {
 }
 
 type Subscription struct {
-    id              string
-    Query           string
-    ResponseChannel chan interface{}
+    id               string
+    Query            string
+    ResponseConduit *ResponseConduit
+    // ResponseChannel chan interface{}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,7 +149,8 @@ func Update () {
         var diff *ResultDiff = resultset_diff(de.Cache, &result)
         
         for _, subscription := range *de.Subscriptions {
-            diff.Transmit(subscription.ResponseChannel, subscription.id)
+            diff.Transmit(subscription.ResponseConduit.Channel, subscription.id)
+            // diff.Transmit(subscription.ResponseChannel, subscription.id)
         }
         
         de.Cache = &result
@@ -159,13 +162,15 @@ func Unsubscribe (id string) bool {
     return true
 }
 
-func NewSubscription (id string, query string, response_channel chan interface{}) *Subscription {
+func NewSubscription (id string, query string, response_conduit *ResponseConduit) *Subscription {
+// func NewSubscription (id string, query string, response_channel chan interface{}) *Subscription {
 // func NewSubscription (id string, query string, response_channel chan []byte) *Subscription {
     var s Subscription
     
     s.id              = id
     s.Query           = query
-    s.ResponseChannel = response_channel
+    s.ResponseConduit = response_conduit
+    // s.ResponseChannel = response_channel
     
     // add to dispatch data structure
     dispatch_mux.Lock()
@@ -221,6 +226,7 @@ func (s *Subscription) Push () {
     
     var result *ResultDiff = NewResultDiff()
     result.Plus = *de.Cache
-    result.Transmit(s.ResponseChannel, s.id)
+    result.Transmit(s.ResponseConduit.Channel, s.id)
+    // result.Transmit(s.ResponseChannel, s.id)
 }
 

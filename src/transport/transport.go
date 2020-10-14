@@ -5,13 +5,14 @@ import (
     "net/http"
     "io/ioutil"
     "encoding/json"
-    "sync"
+    // "sync"
     
     "github.com/gorilla/websocket"
     
     "innose2019-rdf-server/config"
     "innose2019-rdf-server/logic"
     "innose2019-rdf-server/session"
+    . "innose2019-rdf-server/responseconduit"
 )
 
 var (
@@ -161,9 +162,12 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     defer ws.Close()
     
     // response handling
-    var response_channel chan interface{} = make(chan interface{})
+    var rc *ResponseConduit = NewResponseConduit()
+    // var response_channel chan interface{} = make(chan interface{})
     go func () {
-        for pointer := range response_channel {
+        // for pointer := range response_channel {
+        for pointer := range rc.Channel {
+            fmt.Println("transport:websocket_handler forwarder")
             message, err := json.Marshal(pointer)
             if err!=nil {
                 fmt.Println("Warn: Unable to marshal message for websocket transmision:", err)
@@ -178,46 +182,54 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     }()
     
     // initialize garbage collection
-    var refcount int64 = 0
-    var mux sync.Mutex
-    enter(&refcount, mux)
+    // var refcount int64 = 0
+    // var mux sync.Mutex
+    // enter(&refcount, mux)
     
     // enter service loop
-    var s *session.Session = session.NewSession(response_channel)
+    // var s *session.Session = session.NewSession(response_channel)
+    var s *session.Session = session.NewSession(rc)
     for {
         // receive
+        rc.Hello(nil)
+        fmt.Println("transport:websocket_handler read pre")
         _, message, err := ws.ReadMessage()
+        fmt.Println("transport:websocket_handler read post")
         if err!=nil {
             if err.Error()!="websocket: close 1000 (normal)" {
                 fmt.Println("Warn: Unable to receive through websocket:", err)
             }
             // TODO: trigger closing of channel // TODO: done_wg.Done() ; select(empty(response_channel), isdone_wg.Wait()) ; close(response_channel) // implement this in ResponseConduit struct
-            leave(&refcount, mux, response_channel)
+            // leave(&refcount, mux, response_channel)
+            rc.Goodbye()
+            rc.Finalize()
             return
         }
         
         // send off to processing
-        enter(&refcount, mux)
+        // enter(&refcount, mux)
         go func() {
+            fmt.Println("transport:websocket_handler about to dispatch")
             Dispatch(message, s)
-            leave(&refcount, mux, response_channel)
+            rc.Goodbye()
+            // leave(&refcount, mux, response_channel)
         }()
     }
 }
 
-func enter (refcount *int64, mux sync.Mutex) {
-    mux.Lock()
-    *refcount++
-    mux.Unlock()
-}
+// func enter (refcount *int64, mux sync.Mutex) {
+//     mux.Lock()
+//     *refcount++
+//     mux.Unlock()
+// }
 
-func leave (refcount *int64, mux sync.Mutex, response_channel chan interface{}) {
-    mux.Lock()
-    *refcount--
-    mux.Unlock()
+// func leave (refcount *int64, mux sync.Mutex, response_channel chan interface{}) {
+//     mux.Lock()
+//     *refcount--
+//     mux.Unlock()
     
-    if *refcount==0 {
-        close(response_channel) // TODO: this fails when the client dies
-    }
-}
+//     if *refcount==0 {
+//         close(response_channel) // TODO: this fails when the client dies
+//     }
+// }
 

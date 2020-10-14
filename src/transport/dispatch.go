@@ -36,9 +36,11 @@ type TimeEntry struct {
 func (e *TimeEntry) Handle (s *session.Session) {
     var value float64
     var success bool
+    fmt.Println("dispatch:TimeEntry.Handle")
     value, success = logic.Time()
     var response MessageTime = MessageTime{Message{e.Identifier, "time", success}, value}
-    s.ResponseChannel <- &response
+    s.ResponseConduit.Channel <-&response
+    // s.ResponseChannel <- &response
 }
 
 type StoreEntry struct {
@@ -49,7 +51,8 @@ func (e *StoreEntry) Handle (s *session.Session) {
     var filename string
     filename, success = logic.Store(*model_dir)
     var response MessageStore = MessageStore{Message{e.Identifier, "store", success}, filename}
-    s.ResponseChannel <- &response
+    s.ResponseConduit.Channel <-&response
+    // s.ResponseChannel <- &response
 }
 
 type NamespacesEntry struct {
@@ -60,7 +63,8 @@ func (e *NamespacesEntry) Handle (s *session.Session) {
     var result map[string]string
     result, success = logic.Namespaces()
     var response MessageNamespaces = MessageNamespaces{Message{e.Identifier, "namespaces", success}, result}
-    s.ResponseChannel <- &response
+    s.ResponseConduit.Channel <-&response
+    // s.ResponseChannel <- &response
 }
 
 type QueryEntry struct {
@@ -73,7 +77,8 @@ func (e *QueryEntry) Handle (s *session.Session) {
     
     result, success = logic.Query(e.Query)
     var response MessageQuery = MessageQuery{Message{e.Identifier, "query", success}, result}
-    s.ResponseChannel <- &response
+    s.ResponseConduit.Channel <-&response
+    // s.ResponseChannel <- &response
 }
 
 type UpdateEntry struct {
@@ -85,7 +90,8 @@ func (e *UpdateEntry) Handle (s *session.Session) {
     _, success = logic.Update(e.Query)
     subscription.Update()
     var response MessageUpdate = MessageUpdate{Message{e.Identifier, "update", success}}
-    s.ResponseChannel <- &response
+    s.ResponseConduit.Channel <-&response
+    // s.ResponseChannel <- &response
 }
 
 type InspectEntry struct {
@@ -121,7 +127,8 @@ func (e *InspectEntry) Handle (s *session.Session) {
     
     m.Success = err1==nil && err2==nil && err3==nil && err4==nil
     
-    s.ResponseChannel <- &m
+    s.ResponseConduit.Channel <- &m
+    // s.ResponseChannel <- &m
 }
 
 type SubscribeEntry struct {
@@ -138,23 +145,26 @@ func (e *SubscribeEntry) Handle (s *session.Session) {
     fmt.Println(e.Query)
     node, err = sparql.Parse(lexer, e.Query)
     if err != nil {
-        send_response_error(s.ResponseChannel, e.Identifier, "[RESPARQL] Parse error:"+err.Error())
+        send_response_error(s.ResponseConduit.Channel, e.Identifier, "[RESPARQL] Parse error:"+err.Error())
+        // send_response_error(s.ResponseChannel, e.Identifier, "[RESPARQL] Parse error:"+err.Error())
         return
     }
     
     // extract pure sparql
     q, err = node.Resparql("")
     if err != nil {
-        send_response_error(s.ResponseChannel, e.Identifier, "[RESPARQL] Sparqlification error:"+err.Error())
+        send_response_error(s.ResponseConduit.Channel, e.Identifier, "[RESPARQL] Sparqlification error:"+err.Error())
+        // send_response_error(s.ResponseChannel, e.Identifier, "[RESPARQL] Sparqlification error:"+err.Error())
         return
     }
     
-    var sub *subscription.Subscription = subscription.NewSubscription(e.Identifier, q, s.ResponseChannel)
+    var sub *subscription.Subscription = subscription.NewSubscription(e.Identifier, q, s.ResponseConduit)
     s.AddSubscription(e.Identifier, sub)
     
     // send_response(s.ResponseChannel, e.Identifier, "subscribed")
     var response MessageSubscribe = MessageSubscribe{Message{e.Identifier, "subscribe", true}}
-    s.ResponseChannel <- &response
+    s.ResponseConduit.Channel <- &response
+    // s.ResponseChannel <- &response
     
     sub.Push()
 }
@@ -167,7 +177,8 @@ func (e *UnsubscribeEntry) Handle (s *session.Session) {
     subscription.Unsubscribe(e.Identifier)
     // send_response(s.ResponseChannel, e.Identifier, "unsubscribed")
     var response MessageUnsubscribe = MessageUnsubscribe{Message{e.Identifier, "unsubscribe", true}}
-    s.ResponseChannel <- &response
+    s.ResponseConduit.Channel <-&response
+    // s.ResponseChannel <- &response
 }
 
 type SubscriptionsEntry struct {
@@ -176,7 +187,8 @@ type SubscriptionsEntry struct {
 func (e *SubscriptionsEntry) Handle (s *session.Session) {
     var ids []string = s.GetSubscriptionIdentifiers()
     var response MessageSubscriptions = MessageSubscriptions{Message{e.Identifier, "subscriptions", true}, ids}
-    s.ResponseChannel <- &response
+    s.ResponseConduit.Channel <-&response
+    // s.ResponseChannel <- &response
 }
 
 ///////////////////////////////////////////////////////////////////////////////
