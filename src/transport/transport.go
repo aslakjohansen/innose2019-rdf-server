@@ -166,7 +166,6 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     go func () {
         // for pointer := range response_channel {
         for pointer := range rc.Channel {
-            fmt.Println("transport:websocket_handler forwarder")
             message, err := json.Marshal(pointer)
             if err!=nil {
                 fmt.Println("Warn: Unable to marshal message for websocket transmision:", err)
@@ -185,9 +184,7 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     for {
         // receive
         rc.Hello(nil)
-        fmt.Println("transport:websocket_handler read pre")
         _, message, err := ws.ReadMessage()
-        fmt.Println("transport:websocket_handler read post")
         if err!=nil {
             if err.Error()!="websocket: close 1000 (normal)" {
                 fmt.Println("Warn: Unable to receive through websocket:", err)
@@ -199,7 +196,6 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
         
         // send off to processing
         go func() {
-            fmt.Println("transport:websocket_handler about to dispatch")
             Dispatch(message, s)
             rc.Goodbye()
         }()

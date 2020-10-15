@@ -136,7 +136,6 @@ func (e *SubscribeEntry) Handle (s *session.Session) {
     var q     string
     
     // parse tree
-    fmt.Println(e.Query)
     node, err = sparql.Parse(lexer, e.Query)
     if err != nil {
         send_response_error(s.ResponseConduit.Channel, e.Identifier, "[RESPARQL] Parse error:"+err.Error())
