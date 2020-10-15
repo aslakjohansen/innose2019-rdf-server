@@ -163,6 +163,11 @@ func NewSubscription (id string, query string, response_conduit *ResponseConduit
     s.datacols           = dataindices
     s.entity2datachannel = make(map[string](chan reading.Reading))
     
+    fmt.Println("datacols:")
+    for _, entry := range s.datacols {
+        fmt.Println(" - ", entry)
+    }
+    
     // add to dispatch data structure
     dispatch_mux.Lock()
     defer dispatch_mux.Unlock()
