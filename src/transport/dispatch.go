@@ -164,7 +164,7 @@ type UnsubscribeEntry struct {
     Subscription string `json:"subscription"`
 }
 func (e *UnsubscribeEntry) Handle (s *session.Session) {
-    subscription.Unsubscribe(e.Identifier)
+    s.RemoveSubscription(e.Subscription) 
     var response MessageUnsubscribe = MessageUnsubscribe{Message{e.Identifier, "unsubscribe", true}}
     s.ResponseConduit.Channel <-&response
 }

@@ -149,11 +149,6 @@ func Update () {
     }
 }
 
-func Unsubscribe (id string) bool {
-    // TODO: This id is only unique through the context of a session. The session should have an id->subscription dictionary and call destroy on unsubscription
-    return true
-}
-
 func NewSubscription (id string, query string, response_conduit *ResponseConduit) *Subscription {
     var s Subscription
     
