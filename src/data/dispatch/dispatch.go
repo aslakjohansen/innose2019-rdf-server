@@ -8,8 +8,8 @@ import (
 )
 
 var (
-    mutex       sync.Mutex
-    dispatcher *Dispatcher = nil
+    mutex  sync.Mutex
+    D     *Dispatcher = nil
 )
 
 // TODO: Determine if this struct is necessary and we need the cancel field (or if the mutex in dispatch is enough)
@@ -30,11 +30,11 @@ func GetDispatcher ()  *Dispatcher {
     mutex.Lock()
     defer mutex.Unlock()
     
-    if dispatcher==nil {
-        dispatcher = NewDispatcher()
+    if D==nil {
+        D = NewDispatcher()
     }
     
-    return dispatcher
+    return D
 }
 
 func NewDispatcher () *Dispatcher {
