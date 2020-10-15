@@ -73,7 +73,7 @@ func Init (configraw *json.RawMessage) {
         fmt.Println("Error: MQTT subscription failed:", token.Error())
     }
     
-    dispatcher = dispatch.NewDispatcher()
+    dispatcher = dispatch.GetDispatcher()
     channel := dispatcher.Register("test", make(chan reading.Reading))
     
     go func (channel chan reading.Reading) {

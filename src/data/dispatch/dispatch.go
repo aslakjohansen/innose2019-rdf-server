@@ -7,6 +7,11 @@ import (
     "innose2019-rdf-server/data/reading"
 )
 
+var (
+    mutex       sync.Mutex
+    dispatcher *Dispatcher = nil
+)
+
 // TODO: Determine if this struct is necessary and we need the cancel field (or if the mutex in dispatch is enough)
 type DispatchEntry struct {
     stream chan reading.Reading
@@ -20,6 +25,17 @@ type Dispatcher struct {
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////// interface
+
+func GetDispatcher ()  *Dispatcher {
+    mutex.Lock()
+    defer mutex.Unlock()
+    
+    if dispatcher==nil {
+        dispatcher = NewDispatcher()
+    }
+    
+    return dispatcher
+}
 
 func NewDispatcher () *Dispatcher {
     var d Dispatcher
