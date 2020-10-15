@@ -5,12 +5,14 @@ import (
     "net/http"
     "io/ioutil"
     "encoding/json"
-    "sync"
+    // "sync"
     
     "github.com/gorilla/websocket"
     
     "innose2019-rdf-server/config"
     "innose2019-rdf-server/logic"
+    "innose2019-rdf-server/session"
+    . "innose2019-rdf-server/responseconduit"
 )
 
 var (
@@ -160,10 +162,16 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     defer ws.Close()
     
     // response handling
-    var response_channel chan []byte = make(chan []byte)
+    var rc *ResponseConduit = NewResponseConduit()
     go func () {
-        for response := range response_channel {
-            err = ws.WriteMessage(websocket.TextMessage, response)
+        // for pointer := range response_channel {
+        for pointer := range rc.Channel {
+            message, err := json.Marshal(pointer)
+            if err!=nil {
+                fmt.Println("Warn: Unable to marshal message for websocket transmision:", err)
+                continue
+            }
+            err = ws.WriteMessage(websocket.TextMessage, message)
             if err!=nil {
                 fmt.Println("Warn: Unable to send through websocket:", err)
                 return
@@ -171,45 +179,26 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
         }
     }()
     
-    // initialize garbage collection
-    var refcount int64 = 0
-    var mux sync.Mutex
-    enter(&refcount, mux)
-    
     // enter service loop
+    var s *session.Session = session.NewSession(rc)
     for {
         // receive
+        rc.Hello(nil)
         _, message, err := ws.ReadMessage()
         if err!=nil {
             if err.Error()!="websocket: close 1000 (normal)" {
                 fmt.Println("Warn: Unable to receive through websocket:", err)
             }
-            leave(&refcount, mux, response_channel)
+            rc.Goodbye()
+            rc.Finalize()
             return
         }
         
         // send off to processing
-        enter(&refcount, mux)
         go func() {
-            Dispatch(message, response_channel)
-            leave(&refcount, mux, response_channel)
+            Dispatch(message, s)
+            rc.Goodbye()
         }()
-    }
-}
-
-func enter (refcount *int64, mux sync.Mutex) {
-    mux.Lock()
-    *refcount++
-    mux.Unlock()
-}
-
-func leave (refcount *int64, mux sync.Mutex, response_channel chan []byte) {
-    mux.Lock()
-    *refcount--
-    mux.Unlock()
-    
-    if *refcount==0 {
-        close(response_channel)
     }
 }
 
