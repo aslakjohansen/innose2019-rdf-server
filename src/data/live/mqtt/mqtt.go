@@ -82,6 +82,9 @@ func Init (configraw *json.RawMessage) {
             fmt.Println(r)
         }
     }(channel)
+    
+    // TODO: set up subscription to query for mqtt registrations and maintain a topic->entity map based on this. Use this table to dispatch based on entity
+    // TODO: Then per-subscription keep track of the relevant entities (through index matching) and maintain subscriptions to these through data/dispatch/D.(Register|Unregister)
 }
 
 func Finalize () {
