@@ -12,6 +12,9 @@ import (
     "innose2019-rdf-server/data/reading"
     "innose2019-rdf-server/data/dispatch"
     "innose2019-rdf-server/config"
+    "innose2019-rdf-server/subscription"
+    . "innose2019-rdf-server/responseconduit"
+    . "innose2019-rdf-server/message"
 )
 
 type LoggingConfig struct {
@@ -31,6 +34,9 @@ var (
     cfg         MqttModuleConfig;
     c           mqtt.Client
     dispatcher *dispatch.Dispatcher
+    data_rc    *ResponseConduit
+    data_sub   *subscription.Subscription
+    namemap     map[string]string = make(map[string]string)
 )
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -40,7 +46,10 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
         return
     }
     
-    dispatcher.Dispatch(msg.Topic(), reading)
+    entity, ok := namemap[msg.Topic()] // TODO: Allow multiple entities to share a topic
+    if (ok) {
+        dispatcher.Dispatch(entity, reading)
+    }
 }
 
 func Init (configraw *json.RawMessage) {
@@ -74,19 +83,59 @@ func Init (configraw *json.RawMessage) {
     }
     
     dispatcher = dispatch.GetDispatcher()
-    channel := dispatcher.Register("test", make(chan reading.Reading))
+    // channel := dispatcher.Register("test", make(chan reading.Reading))
     
-    go func (channel chan reading.Reading) {
-        for {
-            var r reading.Reading = <- channel
-            fmt.Println(r)
+    // go func (channel chan reading.Reading) {
+    //     for {
+    //         var r reading.Reading = <- channel
+    //         fmt.Println(r)
+    //     }
+    // }(channel)
+    
+    // subscribe to annotation mapping and maintain local map
+    data_rc = NewResponseConduit()
+    var query string = `
+SELECT ?entity ?broker ?topic ?data
+WHERE {
+    ?entity dao:hasMqttLiveData ?data .
+    ?data   rdf:type dao:MqttLiveData .
+    ?data   dao:hasBroker ?broker .
+    ?data   dao:hasTopic  ?topic .
+}
+`
+    data_sub = subscription.NewSubscription("dummyid", query, data_rc)
+    go func () {
+        // var update MessageResultSet
+        for updatei := range data_rc.Channel {
+            update, ok := updatei.(*MessageResultSet)
+            if !ok {
+                fmt.Println("Unable to pass update to topic-> entity map")
+                continue
+            }
+            for _, row := range update.Plus {
+                namemap[row[2]] = row[0]
+            }
+            for _, row := range update.Minus {
+                delete(namemap, row[2])
+            }
+            PrintNamemap()
         }
-    }(channel)
+    }()
+    data_sub.Push()
     
     // TODO: set up subscription to query for mqtt registrations and maintain a topic->entity map based on this. Use this table to dispatch based on entity
+    // TODO: print out topic-> entity map
     // TODO: Then per-subscription keep track of the relevant entities (through index matching) and maintain subscriptions to these through data/dispatch/D.(Register|Unregister)
 }
 
 func Finalize () {
     c.Disconnect(250)
+}
+
+func PrintNamemap () {
+    fmt.Println("<mqtt:namemap>")
+    for key, value := range namemap {
+        fmt.Println("    <mapping key=\""+key+"\" value=\""+value+"\" />")
+    }
+    fmt.Println("</mqtt:namemap>")
 }
