@@ -149,7 +149,10 @@ func (e *SubscribeEntry) Handle (s *session.Session) {
         return
     }
     
-    var sub *subscription.Subscription = subscription.NewSubscription(e.Identifier, q, s.ResponseConduit)
+    // TODO: fetch data indices
+    var dataindices []int = node.GetDataIndices()
+    
+    var sub *subscription.Subscription = subscription.NewSubscription(e.Identifier, q, s.ResponseConduit, dataindices)
     s.AddSubscription(e.Identifier, sub)
     
     var response MessageSubscribe = MessageSubscribe{Message{e.Identifier, "subscribe", true}}

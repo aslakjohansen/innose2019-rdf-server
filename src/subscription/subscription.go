@@ -5,6 +5,8 @@ import (
     "sync"
     
     "innose2019-rdf-server/logic"
+    "innose2019-rdf-server/data/reading"
+    datadispatch "innose2019-rdf-server/data/dispatch"
     . "innose2019-rdf-server/message"
     . "innose2019-rdf-server/responseconduit"
 )
@@ -27,9 +29,11 @@ type ResultDiff struct {
 }
 
 type Subscription struct {
-    id               string
-    Query            string
-    ResponseConduit *ResponseConduit
+    id                   string
+    datacols           []int
+    Query                string
+    ResponseConduit     *ResponseConduit
+    entity2datachannel   map[string](chan reading.Reading)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,19 +146,22 @@ func Update () {
         var diff *ResultDiff = resultset_diff(de.Cache, &result)
         
         for _, subscription := range *de.Subscriptions {
-            diff.Transmit(subscription.ResponseConduit.Channel, subscription.id)
+            subscription.Apply(diff)
+            // diff.Transmit(subscription.ResponseConduit.Channel, subscription.id)
         }
         
         de.Cache = &result
     }
 }
 
-func NewSubscription (id string, query string, response_conduit *ResponseConduit) *Subscription {
+func NewSubscription (id string, query string, response_conduit *ResponseConduit, dataindices []int) *Subscription {
     var s Subscription
     
-    s.id              = id
-    s.Query           = query
-    s.ResponseConduit = response_conduit
+    s.id                 = id
+    s.Query              = query
+    s.ResponseConduit    = response_conduit
+    s.datacols           = dataindices
+    s.entity2datachannel = make(map[string](chan reading.Reading))
     
     // add to dispatch data structure
     dispatch_mux.Lock()
@@ -210,6 +217,43 @@ func (s *Subscription) Push () {
     
     var result *ResultDiff = NewResultDiff()
     result.Plus = *de.Cache
+    // result.Transmit(s.ResponseConduit.Channel, s.id)
+    s.Apply(result)
+}
+
+func (s *Subscription) Apply (result *ResultDiff) {
+    // send update
     result.Transmit(s.ResponseConduit.Channel, s.id)
+    
+    // register new interests
+    for _, row := range result.Plus {
+        for _, i := range s.datacols {
+            var entity string = row[i]
+            var channel chan reading.Reading = make(chan reading.Reading)
+            datadispatch.D.Register(entity, channel)
+            s.entity2datachannel[entity] = channel
+            go func (entity string) {
+                for reading := range channel {
+                    var message MessageData = MessageData{Message{s.id, "data", true}, entity, reading.Timestamp, reading.Value}
+                    s.ResponseConduit.Channel <- message
+                }
+            }(entity)
+        }
+    }
+    
+    // unregister old interests
+    for _, row := range result.Minus {
+        for _, i := range s.datacols {
+            var channel chan reading.Reading
+            var ok bool
+            var entity string = row[i]
+            channel, ok = s.entity2datachannel[entity]
+            if !ok {
+                fmt.Println("Internal error in subscription.Apply: Unable to look up channel for ", entity, " for removal")
+                continue
+            }
+            datadispatch.D.Unregister(entity, channel)
+        }
+    }
 }
 

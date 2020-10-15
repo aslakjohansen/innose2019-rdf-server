@@ -79,7 +79,7 @@ func (n *Node) Resparql (indent string) (string, error) {
     
     switch n.Name {
     case "query":
-        clone := *n
+        clone := *n // TODO: Is that really a clone?
         clone.Children[1].Children = make([]*Node, 0) // data
         clone.Children[2].Children = make([]*Node, 0) // units
         result, err = clone.Normalize(indent)
@@ -89,6 +89,26 @@ func (n *Node) Resparql (indent string) (string, error) {
         err = errors.New(fmt.Sprintf("No case handler defined for sparqlifying a node with name \"%s\".", n.Name))
     }
     return result, err
+}
+
+func (n *Node) GetDataIndices () []int {
+    switch n.Name {
+    case "query":
+        var result = make([]int, len(n.Children[1].Children))
+        for i, dataitem := range n.Children[1].Children {
+            for j, selectitem := range n.Children[3].Children[0].Children {
+                if dataitem.String()==selectitem.String() {
+                    result[i] = j
+                    break
+                }
+            }
+        }
+        return result
+    case "select":
+    default:
+        fmt.Println(fmt.Sprintf("No case handler defined for getting the indices of a node with name \"%s\".", n.Name))
+    }
+    return make([]int, 0)
 }
 
 func (n *Node) Normalize (indent string) (string, error) {

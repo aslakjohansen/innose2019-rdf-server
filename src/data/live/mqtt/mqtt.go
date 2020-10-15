@@ -103,7 +103,7 @@ WHERE {
     ?data   dao:hasTopic  ?topic .
 }
 `
-    data_sub = subscription.NewSubscription("dummyid", query, data_rc)
+    data_sub = subscription.NewSubscription("dummyid", query, data_rc, nil)
     go func () {
         // var update MessageResultSet
         for updatei := range data_rc.Channel {
@@ -123,8 +123,8 @@ WHERE {
     }()
     data_sub.Push()
     
-    // TODO: set up subscription to query for mqtt registrations and maintain a topic->entity map based on this. Use this table to dispatch based on entity
-    // TODO: print out topic-> entity map
+    // TODO: **done** set up subscription to query for mqtt registrations and maintain a topic->entity map based on this. Use this table to dispatch based on entity
+    // TODO: **done** print out topic-> entity map
     // TODO: Then per-subscription keep track of the relevant entities (through index matching) and maintain subscriptions to these through data/dispatch/D.(Register|Unregister)
 }
 

@@ -74,3 +74,10 @@ type MessageResultSet struct {
     Minus [][]string `json:"-"`
 }
 
+type MessageData struct {
+    Message
+    Entity    string  `json:"entity"`
+    Timestamp float64 `json:"time"`
+    Value     float64 `json:"value"`
+}
+

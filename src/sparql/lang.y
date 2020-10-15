@@ -308,6 +308,9 @@ Step
     : Var {
         $$.ast = $1.ast
       }
+    | PrefixedEntity {
+        $$.ast = $1.ast
+      }
     ;
 
 %%
