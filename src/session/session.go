@@ -8,7 +8,6 @@ import (
 )
 
 type Session struct {
-    // ResponseChannel chan interface{}
     ResponseConduit *ResponseConduit
     Subscriptions    map[string](*subscription.Subscription)
 }
@@ -17,10 +16,8 @@ type Session struct {
 /////////////////////////////////////////////////////////// interface functions
 
 func NewSession (response_conduit *ResponseConduit) *Session {
-// func NewSession (response_channel chan interface{}) *Session {
     var s Session
     
-    // s.ResponseChannel = response_channel
     s.ResponseConduit = response_conduit
     s.Subscriptions   = make(map[string](*subscription.Subscription))
     
@@ -36,7 +33,6 @@ func NewSession (response_conduit *ResponseConduit) *Session {
 }
 
 func (s *Session) Destroy () {
-    // close(s.ResponseChannel)
     for id, _ := range s.Subscriptions {
         s.RemoveSubscription(id)
     }

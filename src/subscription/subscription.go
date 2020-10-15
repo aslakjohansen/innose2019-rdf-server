@@ -30,7 +30,6 @@ type Subscription struct {
     id               string
     Query            string
     ResponseConduit *ResponseConduit
-    // ResponseChannel chan interface{}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,10 +50,6 @@ func (r *ResultDiff) Transmit (channel chan interface{}, id string) {
 func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
     var result ResultDiff
     var found_row bool
-    // resultset_print(a)
-    // fmt.Println("")
-    // resultset_print(b)
-    // fmt.Println("subscription.resultset_diff");
     
     result.Plus  = nil
     result.Minus = nil
@@ -77,7 +72,6 @@ func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
             }
         }
         if !found_row {
-            // fmt.Println("  minus added")
             result.Minus = append(result.Minus, rowa)
         }
     }
@@ -100,7 +94,6 @@ func resultset_diff (a *([][]string), b *([][]string)) *ResultDiff {
             }
         }
         if !found_row {
-            // fmt.Println("  plus added")
             result.Plus = append(result.Plus, rowb)
         }
     }
@@ -150,7 +143,6 @@ func Update () {
         
         for _, subscription := range *de.Subscriptions {
             diff.Transmit(subscription.ResponseConduit.Channel, subscription.id)
-            // diff.Transmit(subscription.ResponseChannel, subscription.id)
         }
         
         de.Cache = &result
@@ -163,14 +155,11 @@ func Unsubscribe (id string) bool {
 }
 
 func NewSubscription (id string, query string, response_conduit *ResponseConduit) *Subscription {
-// func NewSubscription (id string, query string, response_channel chan interface{}) *Subscription {
-// func NewSubscription (id string, query string, response_channel chan []byte) *Subscription {
     var s Subscription
     
     s.id              = id
     s.Query           = query
     s.ResponseConduit = response_conduit
-    // s.ResponseChannel = response_channel
     
     // add to dispatch data structure
     dispatch_mux.Lock()
@@ -227,6 +216,5 @@ func (s *Subscription) Push () {
     var result *ResultDiff = NewResultDiff()
     result.Plus = *de.Cache
     result.Transmit(s.ResponseConduit.Channel, s.id)
-    // result.Transmit(s.ResponseChannel, s.id)
 }
 

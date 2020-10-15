@@ -163,7 +163,6 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
     
     // response handling
     var rc *ResponseConduit = NewResponseConduit()
-    // var response_channel chan interface{} = make(chan interface{})
     go func () {
         // for pointer := range response_channel {
         for pointer := range rc.Channel {
@@ -181,13 +180,7 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
         }
     }()
     
-    // initialize garbage collection
-    // var refcount int64 = 0
-    // var mux sync.Mutex
-    // enter(&refcount, mux)
-    
     // enter service loop
-    // var s *session.Session = session.NewSession(response_channel)
     var s *session.Session = session.NewSession(rc)
     for {
         // receive
@@ -199,37 +192,17 @@ func websocket_handler (rw http.ResponseWriter, request *http.Request) {
             if err.Error()!="websocket: close 1000 (normal)" {
                 fmt.Println("Warn: Unable to receive through websocket:", err)
             }
-            // TODO: trigger closing of channel // TODO: done_wg.Done() ; select(empty(response_channel), isdone_wg.Wait()) ; close(response_channel) // implement this in ResponseConduit struct
-            // leave(&refcount, mux, response_channel)
             rc.Goodbye()
             rc.Finalize()
             return
         }
         
         // send off to processing
-        // enter(&refcount, mux)
         go func() {
             fmt.Println("transport:websocket_handler about to dispatch")
             Dispatch(message, s)
             rc.Goodbye()
-            // leave(&refcount, mux, response_channel)
         }()
     }
 }
-
-// func enter (refcount *int64, mux sync.Mutex) {
-//     mux.Lock()
-//     *refcount++
-//     mux.Unlock()
-// }
-
-// func leave (refcount *int64, mux sync.Mutex, response_channel chan interface{}) {
-//     mux.Lock()
-//     *refcount--
-//     mux.Unlock()
-    
-//     if *refcount==0 {
-//         close(response_channel) // TODO: this fails when the client dies
-//     }
-// }
 
