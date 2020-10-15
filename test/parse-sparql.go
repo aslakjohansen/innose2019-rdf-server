@@ -84,6 +84,14 @@ func main () {
             }
         }
         
+        if err==nil {
+            var indices []int = node.GetDataIndices()
+            fmt.Println("[Data Indices]:")
+            for i, index := range indices {
+                fmt.Println(" - ", i, ":", index)
+            }
+        }
+        
         fmt.Println("")
     }
 }
