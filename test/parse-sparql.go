@@ -40,6 +40,8 @@ func main () {
       "PREFIX a:<http://b> DATA ?var1 ?var3 SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
       "PREFIX a:<http://b> DATA ?var1 ?var3 SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
       "PREFIX a:<http://b> DATA ?var1 ?var3 UNITS mod:temp->unit:degc mod:dist->unit:m SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
+      "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 ns:name . }",
+      "DATA ?temp SELECT ?temp WHERE { ?temp rdf:type/brick:subClassOf* gfb:Water_Temperature_Sensor . }",
     }
     
     for _, input := range inputs {
