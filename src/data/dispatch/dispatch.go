@@ -88,7 +88,6 @@ func (d Dispatcher) Unregister (id string, channel chan reading.Reading) bool {
     
     // cleanup
     go func (entry DispatchEntry) {
-//        entry.cancel <- true // signal cancelation
         close(entry.stream)
         for range entry.stream {} // empty stream for remaining data
     }(entry)

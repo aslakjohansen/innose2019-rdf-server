@@ -83,14 +83,6 @@ func Init (configraw *json.RawMessage) {
     }
     
     dispatcher = dispatch.GetDispatcher()
-    // channel := dispatcher.Register("test", make(chan reading.Reading))
-    
-    // go func (channel chan reading.Reading) {
-    //     for {
-    //         var r reading.Reading = <- channel
-    //         fmt.Println(r)
-    //     }
-    // }(channel)
     
     // subscribe to annotation mapping and maintain local map
     data_rc = NewResponseConduit()
@@ -122,10 +114,6 @@ WHERE {
         }
     }()
     data_sub.Push()
-    
-    // TODO: **done** set up subscription to query for mqtt registrations and maintain a topic->entity map based on this. Use this table to dispatch based on entity
-    // TODO: **done** print out topic-> entity map
-    // TODO: Then per-subscription keep track of the relevant entities (through index matching) and maintain subscriptions to these through data/dispatch/D.(Register|Unregister)
 }
 
 func Finalize () {

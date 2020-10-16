@@ -16,8 +16,6 @@ var (
     dispatch map[string](*DispatchEntry) = make(map[string](*DispatchEntry))
 )
 
-// type ResultSet ([][]string)
-
 type DispatchEntry struct {
     Cache            *([][]string)
     Subscriptions *[]*Subscription
@@ -147,7 +145,6 @@ func Update () {
         
         for _, subscription := range *de.Subscriptions {
             subscription.Apply(diff)
-            // diff.Transmit(subscription.ResponseConduit.Channel, subscription.id)
         }
         
         de.Cache = &result
@@ -163,10 +160,10 @@ func NewSubscription (id string, query string, response_conduit *ResponseConduit
     s.datacols           = dataindices
     s.entity2datachannel = make(map[string](chan reading.Reading))
     
-    fmt.Println("datacols:")
-    for _, entry := range s.datacols {
-        fmt.Println(" - ", entry)
-    }
+    // fmt.Println("datacols:")
+    // for _, entry := range s.datacols {
+    //     fmt.Println(" - ", entry)
+    // }
     
     // add to dispatch data structure
     dispatch_mux.Lock()
@@ -227,7 +224,6 @@ func (s *Subscription) Push () {
     
     var result *ResultDiff = NewResultDiff()
     result.Plus = *de.Cache
-    // result.Transmit(s.ResponseConduit.Channel, s.id)
     s.Apply(result)
 }
 

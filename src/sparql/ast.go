@@ -81,11 +81,11 @@ func (n *Node) Resparql (indent string) (string, error) {
     case "query":
         var c *Node = NewNode(n.Name, n.Token)
         c.Children = make([]*Node, 4)
-        c.Children[0] = n.Children[0]    // prefix
+        c.Children[0] = n.Children[0]            // prefix
         c.Children[1] = NewNode("list", n.Token) // data
         c.Children[1].Children = make([]*Node, 0)
-        c.Children[2] = c.Children[1] // units
-        c.Children[3] = n.Children[3]    // select
+        c.Children[2] = c.Children[1]            // units
+        c.Children[3] = n.Children[3]            // select
         result, err = c.Normalize(indent)
     case "select":
         result, err = n.Normalize(indent)
@@ -98,15 +98,9 @@ func (n *Node) Resparql (indent string) (string, error) {
 func (n *Node) GetDataIndices () []int {
     switch n.Name {
     case "query":
-        // fmt.Println("ast:GetDataIndices: first1 ", n.String())
-        // fmt.Println("ast:GetDataIndices: first2 ", n.Children[1].String())
-        // fmt.Println("ast:GetDataIndices: first2 ", n.Children[1].Children)
         var result = make([]int, len(n.Children[1].Children))
-        // fmt.Println("ast:GetDataIndices: entry ", len(n.Children[1].Children))
         for i, dataitem := range n.Children[1].Children {
-            // fmt.Println("ast:GetDataIndices: - ", i)
             for j, selectitem := range n.Children[3].Children[0].Children {
-                // fmt.Println("ast:GetDataIndices: - ", i, j, ":", dataitem.String(), "vs", selectitem.String())
                 if dataitem.String()==selectitem.String() {
                     result[i] = j
                     break
