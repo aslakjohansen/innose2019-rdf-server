@@ -200,6 +200,11 @@ func (s *Subscription) Destroy () {
         }
     }
     dispatch_mux.Unlock()
+    
+    // unregister data
+    for entity, channel := range s.entity2datachannel {
+        datadispatch.D.Unregister(entity, channel)
+    }
 }
 
 func (s *Subscription) String () string {
