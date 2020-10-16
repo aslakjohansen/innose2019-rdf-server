@@ -66,7 +66,6 @@ func (d Dispatcher) Register (id string, channel chan reading.Reading) chan read
 }
 
 func (d Dispatcher) Unregister (id string, channel chan reading.Reading) bool {
-    fmt.Println("data/dispatch:.Unregister first", id)
     d.mutex.Lock()
     defer d.mutex.Unlock()
     
@@ -79,7 +78,6 @@ func (d Dispatcher) Unregister (id string, channel chan reading.Reading) bool {
     // locate entry
     i, ok := locate(entries, channel)
     if !ok {
-        fmt.Println("data/dispatch:.Unregister entry not located")
         return false
     }
     
@@ -90,12 +88,9 @@ func (d Dispatcher) Unregister (id string, channel chan reading.Reading) bool {
     
     // cleanup
     go func (entry DispatchEntry) {
-        fmt.Println("data/dispatch:.Unregister cleanup a")
 //        entry.cancel <- true // signal cancelation
         close(entry.stream)
-        fmt.Println("data/dispatch:.Unregister cleanup b")
         for range entry.stream {} // empty stream for remaining data
-        fmt.Println("data/dispatch:.Unregister cleanup c")
     }(entry)
     
     return true
