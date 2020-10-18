@@ -15,6 +15,7 @@ import (
 %token SELECT
 %token WHERE
 %token UNION
+%token OPTIONAL
 %token DATA
 %token UNITS
 %token PREFIX
@@ -216,10 +217,21 @@ Restriction
         node.AddChild($3.ast)
         $$.ast = node
       }
-    | LBRACE Restriction RBRACE UNION LBRACE Restriction RBRACE {
+    | LBRACE RestrictionList RBRACE UNION LBRACE RestrictionList RBRACE {
+        firstlist := $2.ast
+        firstlist.CollapseChildList()
+        secondlist := $6.ast
+        secondlist.CollapseChildList()
         node := NewNode("union", $4.token)
-        node.AddChild($2.ast)
-        node.AddChild($6.ast)
+        node.AddChild(firstlist)
+        node.AddChild(secondlist)
+        $$.ast = node
+      }
+    | OPTIONAL LBRACE RestrictionList RBRACE {
+        optlist := $3.ast
+        optlist.CollapseChildList()
+        node := NewNode("optional", $1.token)
+        node.AddChild(optlist)
         $$.ast = node
       }
     ;

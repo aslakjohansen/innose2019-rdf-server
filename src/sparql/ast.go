@@ -239,22 +239,35 @@ func (n *Node) Normalize (indent string) (string, error) {
         
         result = fmt.Sprintf("%s%s %s %s .\n", indent, sub, pred, objz)
     case "union":
-        var first string
-        first, err = n.Children[0].Normalize(indent+"    ")
-        if err!=nil {
-            break
-        }
-        
-        var second string
-        second, err = n.Children[1].Normalize(indent+"    ")
-        if err!=nil {
-            break
-        }
+        var cresult string
         
         result += fmt.Sprintf("%s{\n", indent)
-        result += first
+        for _, child := range n.Children[0].Children {
+            cresult, err = child.Normalize("        ")
+            if err!=nil {
+                break
+            }
+            result += cresult
+        }
         result += fmt.Sprintf("%s} UNION {\n", indent)
-        result += second
+        for _, child := range n.Children[1].Children {
+            cresult, err = child.Normalize("        ")
+            if err!=nil {
+                break
+            }
+            result += cresult
+        }
+        result += fmt.Sprintf("%s} .\n", indent)
+    case "optional":
+        var cresult string
+        result += fmt.Sprintf("%sOPTIONAL {\n", indent)
+        for _, child := range n.Children[0].Children {
+            cresult, err = child.Normalize("        ")
+            if err!=nil {
+                break
+            }
+            result += cresult
+        }
         result += fmt.Sprintf("%s} .\n", indent)
     case "uri":
         result = string(n.Token.Lexeme)
