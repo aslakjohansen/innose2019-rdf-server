@@ -1,6 +1,8 @@
-# REST Interface
+# Interface
 
-## Fetch time from server
+## REST
+
+### Fetch time from server
 
 ```shell
 $ curl -X PUT -d '42' http://localhost:8001/time
@@ -12,7 +14,7 @@ $ curl -X PUT -d '42' http://localhost:8001/time
 
 **Note:** The `42` payload is not used, but the payload needs to be valid json.
 
-## Store model to disk
+### Store model to disk
 
 ```shell
 $ curl -X PUT -d '42' http://localhost:8001/store
@@ -24,7 +26,7 @@ $ curl -X PUT -d '42' http://localhost:8001/store
 
 **Note:** The `42` payload is not used, but the payload needs to be valid json.
 
-## Fetch the current namespace mapping
+### Fetch the current namespace mapping
 
 ```shell
 $ curl -X PUT -d '42' http://localhost:8001/namespaces
@@ -49,7 +51,7 @@ $ curl -X PUT -d '42' http://localhost:8001/namespaces
 
 **Note:** The `42` payload is not used, but the payload needs to be valid json.
 
-## Resolving a query
+### Resolving a query
 
 ```shell
 $ curl -X PUT -d '"SELECT ?pred ?obj WHERE {brick:Sensor ?pred ?obj .}"' http://localhost:8001/query
@@ -78,7 +80,7 @@ $ curl -X PUT -d '"SELECT ?pred ?obj WHERE {brick:Sensor ?pred ?obj .}"' http://
 
 ```
 
-## Perform an update
+### Perform an update
 
 ```shell
 $ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n\nDELETE { brick:Sensor rdfs:subClassOf ?obj .} WHERE {brick:Sensor rdfs:subClassOf ?obj .}"' http://localhost:8001/update
@@ -92,7 +94,7 @@ $ curl -X PUT -d '"PREFIX brick: <https://brickschema.org/schema/1.1.0/Brick#>\n
 - a where clause must exist
 - no slashes in entity names
 
-## Inspect a query
+### Inspect a query
 
 ```shell
 $ curl -X PUT -d '"! SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhost:8001/inspect
@@ -132,3 +134,14 @@ $ curl -X PUT -d '"SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhos
 
 **Note:** This may provide useful insights while debugging.
 
+## WebSocket
+
+There is a dotfile [here](./etc/.rdf-client_history). Copy it to `~/.rdf-client_history`.
+
+Build and run client:
+```shell
+innose2019-rdf-server/src$ make rdf-client
+innose2019-rdf-server/src$ ./rdf-client 127.0.0.1 8001
+```
+
+Use the up arrow to cycle through the commands in the history file. Press enter to sent the current command. Replies will be buffered and the buffer flushed to the screen when enter is pressed.
