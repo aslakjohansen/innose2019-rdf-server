@@ -136,7 +136,7 @@ $ curl -X PUT -d '"SELECT ?pred ?obj WHERE {?sub ?pred ?obj .}"' http://localhos
 
 ## WebSocket
 
-There is a dotfile [here](./etc/.rdf-client_history). Copy it to `~/.rdf-client_history`.
+There is a dotfile [here](../etc/.rdf-client_history). Copy it to `~/.rdf-client_history`.
 
 Build and run client:
 ```shell
