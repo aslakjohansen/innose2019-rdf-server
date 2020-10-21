@@ -1,6 +1,8 @@
 # Documentation Index
 
 - [Building](building.md)
+    - [Preliminaries](building.md#preliminaries)
+    - [Build Command](building.md#build-command)
 - [Running](running.md)
 - [Interface](interface.md)
     - [REST](interface.md#rest)
