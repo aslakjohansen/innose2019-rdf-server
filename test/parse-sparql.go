@@ -26,7 +26,7 @@ func main () {
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2++ ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2* ?var3 . }",
       "SELECT ?var1 ?var2 ?var3 WHERE { ?var1 (?var2|?var3)/?var4 ?var5 . }",
-      "SELECT ?var1 ?var2 WHERE { { ?var1 ?var1 ?var2 } UNION { ?var1 ?var2 ?var2 } . }",
+      "SELECT ?var1 ?var2 WHERE { { ?var1 ?var1 ?var2 . } UNION { ?var1 ?var2 ?var2 . } . }",
       "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 < http://www.google.com#test > . }",
       "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 <http://www.google.com#test> . }",
       "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 \"\" . }",
@@ -40,6 +40,9 @@ func main () {
       "PREFIX a:<http://b> DATA ?var1 ?var3 SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
       "PREFIX a:<http://b> DATA ?var1 ?var3 SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
       "PREFIX a:<http://b> DATA ?var1 ?var3 UNITS mod:temp->unit:degc mod:dist->unit:m SELECT ?var1 ?var2 ?var3 WHERE { ?var1 ?var2 ?var3 . }",
+      "SELECT ?var1 ?var2 WHERE { ?var1 ?var2 ns:name . }",
+      "DATA ?temp SELECT ?temp WHERE { ?temp rdf:type/brick:subClassOf* gfb:Water_Temperature_Sensor . }",
+      "SELECT ?var1 ?var3 WHERE { ?var1 ?var2 ns:name . OPTIONAL {?var1 ?var2 ?var3 . } . }",
     }
     
     for _, input := range inputs {
@@ -79,6 +82,14 @@ func main () {
             } else {
                 fmt.Println("[RESPARQL]")
                 fmt.Print(line)
+            }
+        }
+        
+        if err==nil {
+            var indices []int = node.GetDataIndices()
+            fmt.Println("[Data Indices]:")
+            for i, index := range indices {
+                fmt.Println(" - ", i, ":", index)
             }
         }
         

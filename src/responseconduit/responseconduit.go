@@ -1,4 +1,4 @@
-package transport
+package responseconduit
 
 import (
     // "fmt"
@@ -23,8 +23,7 @@ func NewResponseConduit () *ResponseConduit {
 }
 
 // declare an interest
-func (rc *ResponseConduit) Hello (channel chan int) { // TODO: Add bool return to resolve race condition by indicating that conduit is being closed
-    // fmt.Println("responseconduit:hello")
+func (rc *ResponseConduit) Hello (channel chan int) { // TODO: Add bool return to resolve potential race condition by indicating that conduit is being closed
     
     rc.mutex.Lock()
     rc.done.Add(1)
@@ -36,15 +35,11 @@ func (rc *ResponseConduit) Hello (channel chan int) { // TODO: Add bool return t
 
 // signal that you are producing no more data
 func (rc *ResponseConduit) Goodbye () {
-    // fmt.Println("responseconduit:goodbye")
-    
     rc.done.Done()
 }
 
 // request goodbyes
 func (rc *ResponseConduit) Finalize () {
-    // fmt.Println("responseconduit:finalize")
-    
     // drain channel
     go func () {
         for range rc.Channel {}

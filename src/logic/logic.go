@@ -40,12 +40,18 @@ func Init (configraw *json.RawMessage) {
         fmt.Println("Unable to unmarshal config for module 'logic':", err)
     }
     
+    // python.PyEval_InitThreads() // https://stackoverflow.com/questions/8451334/why-is-pygilstate-release-throwing-fatal-python-errors
+    
     runtime.LockOSThread() // stick go routine to thread
     
     err = python.Initialize()
     if err != nil {
         fmt.Println("Unable to initialize python", err)
     }
+    
+    // ensure mutual exclusion
+    state, gstate := enter()
+    defer leave(state, gstate)
     
     module := python.PyImport_ImportModule(module_name)
     if module == nil {
@@ -93,16 +99,23 @@ func Finalize () {
 }
 
 func load_model (model_dir string, ontology_dir string) {
-    state, gstate := enter()
+    arg0 := python.PyString_FromString(model_dir)
+    arg1 := python.PyString_FromString(ontology_dir)
     
     // construct arguments
     args := python.PyTuple_New(2)
-    python.PyTuple_SET_ITEM(args, 0, python.PyString_FromString(model_dir))
-    python.PyTuple_SET_ITEM(args, 1, python.PyString_FromString(ontology_dir))
+    python.PyTuple_SET_ITEM(args, 0, arg0)
+    python.PyTuple_SET_ITEM(args, 1, arg1)
     
-    python_load_model.Call(args, python.PyDict_New())
+    // make call
+    callargs := python.PyDict_New()
+    python_load_model.Call(args, callargs)
     
-    leave(state, gstate)
+    // gc
+    // defer arg0.DecRef()
+    // defer arg1.DecRef()
+    // defer args.DecRef()
+    // defer callargs.DecRef()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,63 +123,101 @@ func load_model (model_dir string, ontology_dir string) {
 
 func Time () (float64, bool) {
     state, gstate := enter()
+    defer leave(state, gstate)
     
-    resPython := python_time.Call(python.PyTuple_New(0), python.PyDict_New())
+    // call
+    arg0 := python.PyTuple_New(0)
+    arg1 := python.PyDict_New()
+    resPython := python_time.Call(arg0, arg1)
     success, result := unpack_float64(resPython)
     
-    leave(state, gstate)
+    // gc
+    // arg0.DecRef()
+    // arg1.DecRef()
+    
     return result, success;
 }
 
 func Store (model_dir string) (string, bool) {
     state, gstate := enter()
+    defer leave(state, gstate)
     
     // construct arguments
     args := python.PyTuple_New(1)
-    python.PyTuple_SET_ITEM(args, 0, python.PyString_FromString(model_dir))
+    arg0 := python.PyString_FromString(model_dir)
+    python.PyTuple_SET_ITEM(args, 0, arg0)
     
-    resPython := python_store.Call(args, python.PyDict_New())
+    // call
+    callargs := python.PyDict_New()
+    resPython := python_store.Call(args, callargs)
     success, result := unpack_string(resPython)
     
-    leave(state, gstate)
+    // gc
+    // arg0.DecRef()
+    // args.DecRef()
+    // callargs.DecRef()
+    
     return result, success;
 }
 
 func Namespaces () (map[string]string, bool) {
     state, gstate := enter()
+    defer leave(state, gstate)
     
-    resPython := python_namespaces.Call(python.PyTuple_New(0), python.PyDict_New())
+    // call
+    arg0 := python.PyTuple_New(0)
+    arg1 := python.PyDict_New()
+    resPython := python_namespaces.Call(arg0, arg1)
     success, result := unpack_string2string(resPython)
     
-    leave(state, gstate)
+    // gc
+    // arg0.DecRef()
+    // arg1.DecRef()
+    
     return result, success;
 }
 
 func Query (q string) ([][]string, bool) {
     state, gstate := enter()
+    defer leave(state, gstate)
     
     // construct arguments
     args := python.PyTuple_New(1)
-    python.PyTuple_SET_ITEM(args, 0, python.PyString_FromString(q))
+    arg0 := python.PyString_FromString(q)
+    python.PyTuple_SET_ITEM(args, 0, arg0)
     
-    resPython := python_query.Call(args, python.PyDict_New())
+    // call
+    callargs := python.PyDict_New()
+    resPython := python_query.Call(args, callargs)
     success, result := unpack_string2d(resPython)
     
-    leave(state, gstate)
+    // gc
+    // arg0.DecRef()
+    // args.DecRef()
+    // callargs.DecRef()
+    
     return result, success;
 }
 
 func Update (q string) (bool, bool) {
     state, gstate := enter()
+    defer leave(state, gstate)
     
     // construct arguments
     args := python.PyTuple_New(1)
-    python.PyTuple_SET_ITEM(args, 0, python.PyString_FromString(q))
+    arg0 := python.PyString_FromString(q)
+    python.PyTuple_SET_ITEM(args, 0, arg0)
     
-    resPython := python_update.Call(args, python.PyDict_New())
+    // call
+    callargs := python.PyDict_New()
+    resPython := python_update.Call(args, callargs)
     success, _ := unpack(resPython)
     
-    leave(state, gstate)
+    // gc
+    // arg0.DecRef()
+    // args.DecRef()
+    // callargs.DecRef()
+    
     return success, success;
 }
 

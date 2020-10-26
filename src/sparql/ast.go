@@ -79,16 +79,40 @@ func (n *Node) Resparql (indent string) (string, error) {
     
     switch n.Name {
     case "query":
-        clone := *n
-        clone.Children[1].Children = make([]*Node, 0) // data
-        clone.Children[2].Children = make([]*Node, 0) // units
-        result, err = clone.Normalize(indent)
+        var c *Node = NewNode(n.Name, n.Token)
+        c.Children = make([]*Node, 4)
+        c.Children[0] = n.Children[0]            // prefix
+        c.Children[1] = NewNode("list", n.Token) // data
+        c.Children[1].Children = make([]*Node, 0)
+        c.Children[2] = c.Children[1]            // units
+        c.Children[3] = n.Children[3]            // select
+        result, err = c.Normalize(indent)
     case "select":
         result, err = n.Normalize(indent)
     default:
         err = errors.New(fmt.Sprintf("No case handler defined for sparqlifying a node with name \"%s\".", n.Name))
     }
     return result, err
+}
+
+func (n *Node) GetDataIndices () []int {
+    switch n.Name {
+    case "query":
+        var result = make([]int, len(n.Children[1].Children))
+        for i, dataitem := range n.Children[1].Children {
+            for j, selectitem := range n.Children[3].Children[0].Children {
+                if dataitem.String()==selectitem.String() {
+                    result[i] = j
+                    break
+                }
+            }
+        }
+        return result
+    case "select":
+    default:
+        fmt.Println(fmt.Sprintf("No case handler defined for getting the indices of a node with name \"%s\".", n.Name))
+    }
+    return make([]int, 0)
 }
 
 func (n *Node) Normalize (indent string) (string, error) {
@@ -215,22 +239,35 @@ func (n *Node) Normalize (indent string) (string, error) {
         
         result = fmt.Sprintf("%s%s %s %s .\n", indent, sub, pred, objz)
     case "union":
-        var first string
-        first, err = n.Children[0].Normalize(indent+"    ")
-        if err!=nil {
-            break
-        }
-        
-        var second string
-        second, err = n.Children[1].Normalize(indent+"    ")
-        if err!=nil {
-            break
-        }
+        var cresult string
         
         result += fmt.Sprintf("%s{\n", indent)
-        result += first
+        for _, child := range n.Children[0].Children {
+            cresult, err = child.Normalize("        ")
+            if err!=nil {
+                break
+            }
+            result += cresult
+        }
         result += fmt.Sprintf("%s} UNION {\n", indent)
-        result += second
+        for _, child := range n.Children[1].Children {
+            cresult, err = child.Normalize("        ")
+            if err!=nil {
+                break
+            }
+            result += cresult
+        }
+        result += fmt.Sprintf("%s} .\n", indent)
+    case "optional":
+        var cresult string
+        result += fmt.Sprintf("%sOPTIONAL {\n", indent)
+        for _, child := range n.Children[0].Children {
+            cresult, err = child.Normalize("        ")
+            if err!=nil {
+                break
+            }
+            result += cresult
+        }
         result += fmt.Sprintf("%s} .\n", indent)
     case "uri":
         result = string(n.Token.Lexeme)
